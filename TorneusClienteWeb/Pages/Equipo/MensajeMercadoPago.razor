@@ -1,0 +1,85 @@
+﻿@page "/EQUIPO/NotificacionMercadoPago"
+@layout LayoutVacio
+@inject ILocalStorageService _localStorage
+@inject NavigationManager _nav
+@inject InscripcionServicio _servicioInscripcion
+@inject UsuarioServicio _servicioUsuario
+@inject ISnackbar _snackbar;
+
+
+<div class="d-flex justify-content-center align-items-center flex-column boxCenterPantalla">
+    <img src="@UrlResultado()" alt="" class="imagen-100" />
+    <p>Volviendo a la pantalla principal...</p>
+</div>
+
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string resultadoMp { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string payment_id { get; set; }
+
+
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public string preference_id { get; set; }
+
+
+    string imagenResultado = "";
+    PreferenciaMercadopagoDTO preferenciaMP;
+
+    protected async override Task OnInitializedAsync()
+    {
+        preferenciaMP = await _localStorage.GetItemAsync<PreferenciaMercadopagoDTO>(Util.MERCADOPAGO_CONST);
+        var usuarioLogueado = await _localStorage.GetItemAsync<UsuarioLogueado>(Util.TOKEN_LOCAL);
+
+        _servicioUsuario.ActualizarUsuarioLogueado(usuarioLogueado);
+
+        if (preferenciaMP == null) NavegarRaiz();
+
+        AnalizarRedireccionMercadoPago();
+    }
+
+    private void NavegarRaiz()
+    {
+        _nav.NavigateTo("/", true);
+    }
+
+    private string UrlResultado()
+    {
+        return $"/imagenes/MP_{resultadoMp}.png";
+    }
+
+    private async void AnalizarRedireccionMercadoPago()
+    {
+        try
+        {
+            preferenciaMP.OrdenPagoId = payment_id; ;
+
+
+            if (resultadoMp == Util.EstadoPago.PAGADO.ToString())
+            {
+                await _servicioInscripcion.ActualizarMercadoPago(preferenciaMP); 
+            }
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add(ex.Message, Severity.Warning);
+        }
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Task.Delay(5000);
+        NavegarRaiz();
+    }
+
+
+
+
+
+}

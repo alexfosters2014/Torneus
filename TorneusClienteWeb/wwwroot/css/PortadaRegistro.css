@@ -1,0 +1,58 @@
+﻿
+.banner-registro {
+    position: relative;
+    height: 15vh;
+    width: 100%;
+}
+
+banner-upload{
+    position:relative
+}
+
+.banner-registro div:first-child {
+    position: relative;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
+
+    .banner-registro div {
+        box-shadow: 1px 1px 15px 2px blueviolet;
+        box-sizing: border-box;
+        background-size: cover;
+    }
+
+        .banner-registro div:last-child {
+            position: absolute;
+            top: 25px;
+            height: 80%;
+            width: 100%;
+            z-index: -9;
+        }
+
+    .banner-registro p {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+
+
+    /*Portada registro de equipo*/
+
+.vista-equipo-avatar{
+    display:flex;
+    justify-content:center;
+}
+    .vista-equipo-avatar div {
+        position: relative;
+        height: 25vw;
+        width: 25vw;
+        border-radius: 50%;
+        box-shadow: 1px 1px 15px 2px blueviolet;
+        box-sizing: border-box;
+        background-size: cover;
+        margin-bottom: 30px;
+    }
+
+
+

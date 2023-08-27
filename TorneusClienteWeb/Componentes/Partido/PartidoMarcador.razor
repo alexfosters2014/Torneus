@@ -1,0 +1,391 @@
+﻿@inject TorneoServicio _servicioTorneo
+@inject FixtureServicio _servicioFixture
+@inject UsuarioServicio _servicioUsuario
+@inject IConfiguration _config
+@inject ISnackbar _snackBar
+@inject HubConnection _hubConnection
+@inject NotificacionesSignalRService _servicioNotificacionesSignalR
+@inject AutPlanilleroServicio _servicioAutPlanillero
+@inject NotificacionServicio _servicioNotificacion
+
+
+@if (Partido != null)
+{
+    <div class="gridContainer @ColorActivo()">
+        <div class="vis caja">
+            <p>@((Partido.EquipoLocal == null || Partido.EquipoLocal.Id == 0) ? MensajeEsperandoContrincante() : Partido.EquipoLocal.Abreviatura)</p>
+            <img src="@((Partido.EquipoLocal == null || Partido.EquipoLocal.Id == 0) ? EscudoVacio() : ActualizarLinkImagen(Partido.EquipoLocal.Logo))" alt="" class="imgLogosEquipos">
+        </div>
+
+        <div class="puntV caja tamanioPuntaje">
+            <h3>@Partido.PuntajeLocal</h3>
+        </div>
+
+        <div class="medio caja">
+            <p class="gridContwainerFecha">@Partido.Fecha.ToString("dd/MM/yyyy")</p>
+            <p title="@Partido.HistorialSet">VS</p>
+            <p>@DuracionPartido()</p>
+            <p>@AdicionalInfoGrupo()</p>
+            <p>@Partido.NombreCancha</p>
+        </div>
+
+        <div class="puntL caja tamanioPuntaje">
+            <h3>@Partido.PuntajeVisitante</h3>
+        </div>
+
+        <div class="loc caja">
+            <p>@((Partido.EquipoVisitante == null || Partido.EquipoVisitante.Id == 0) ? MensajeEsperandoContrincante() : Partido.EquipoVisitante.Abreviatura)</p>
+            <img src="@((Partido.EquipoVisitante == null || Partido.EquipoVisitante.Id == 0) ?  EscudoVacio() : ActualizarLinkImagen(Partido.EquipoVisitante.Logo))" alt="" class="imgLogosEquipos">
+        </div>
+
+
+        @if (Partido.EstadoPartido == Util.EstadoPartido.EN_PROCESO.ToString())
+        {
+           <div class="sep caja">
+            <hr>
+        </div>
+
+        <div class="marcV caja">
+            <a href="#" @onclick="() => AumentarMarcador(Util.LOCAL)"
+                        @ontouchstart="e => ComienzoToqueLargo(e, Util.LOCAL)"
+                        @ontouchend="FinToqueLargo"
+                        @onclick:preventDefault>
+             <h2>@Partido.MarcadorLocal.ToString("00")</h2>
+            </a>
+                <MarcadorSetsGanados CantidadSetGanados="Partido.SetGanadosLocal" />
+        </div>
+
+        <div class="medioSet caja">
+            <h4>SET: @Partido.SetActual</h4>
+            <img src="/imagenes/jugando2.gif" alt="jugando"/>
+        </div>
+
+        <div class="marcL caja">
+                <a href="#" @onclick="() => AumentarMarcador(Util.VISITANTE)"
+                            @ontouchstart="e => ComienzoToqueLargo(e, Util.VISITANTE)"
+                            @ontouchend="FinToqueLargo"
+                            @onclick:preventDefault>
+                    <h2 >@Partido.MarcadorVisitante.ToString("00")</h2>
+                </a>
+                <MarcadorSetsGanados CantidadSetGanados="Partido.SetGanadosVisitante" />
+        </div>
+
+            <div class="pie">
+                <p>@Partido.HistorialSet</p>
+            </div>
+            <EspacioVertical Altura="20px" />
+        }
+
+        @if (usuarioAutorizadoMarcador)
+        {
+            @if (Partido.EquipoLocal != null && Partido.EquipoVisitante != null && Partido.EstadoPartido == Util.EstadoPartido.PENDIENTE.ToString())
+            {
+                <div class="playPartido">
+
+                     <a href="" @onclick="NotificarComienzoAEquipos" @onclick:preventDefault>
+                        <img src="/imagenes/enviarPartido.png" alt="" class="imgPlay">
+                    </a>
+
+                    <EspacioVertical Altura="3px" />
+
+                    <a href="" @onclick="ComenzarPartido" @onclick:preventDefault>
+                        <img src="/imagenes/@ImagenPlay" alt="" class="imgPlay">
+
+                    </a>
+                </div>
+            }
+        }
+       
+    </div>
+
+   <EspacioVertical Altura="25px" />
+
+}
+
+
+
+
+
+
+@code {
+    [Parameter]
+    public PartidoDTO Partido { get; set; }
+
+    int SetsMax = 0; //extraer del servicio de torneo
+    int PuntajeMax = 0;
+    int PuntajeMaxDefinitorio = 0;
+    int TorneoId = 0;
+
+    [Parameter]
+    public EventCallback<PartidoDTO> SiguientePartido { get; set; }
+
+    private int setDiferencia = 0;
+    private int puntajeMaximoSegunSet = 0;
+
+    private bool EsconderIconoPlay = true;
+
+    private string ImagenPlay = "play.png";
+
+    private DateTime HorarioInicioPartido;
+
+    private bool touchLargoCorriendo = false;
+    private bool usuarioAutorizadoMarcador = false;
+
+    private bool esToqueLArgo = false;
+    private Timer toqueLargoTimer;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Iniciar();
+    }
+
+    private async Task Iniciar()
+    {
+        TorneoDTO torneoActual = _servicioTorneo.ObtenerTorneoActual();
+
+        int SetsMax = torneoActual.SetsMax; 
+        int PuntajeMax = torneoActual.PuntajeMax;
+        int PuntajeMaxDefinitorio = torneoActual.PuntajeMaxUltimoSet;
+        int TorneoId = torneoActual.Id;
+
+        decimal mitadSetTotales = Math.Round(Convert.ToDecimal(SetsMax) / 2, 2);
+        setDiferencia = (int)Math.Ceiling(mitadSetTotales);
+
+        puntajeMaximoSegunSet = PuntajeMax;
+        if (Partido.PuntajeLocal > 0 || Partido.PuntajeVisitante > 0) EsconderIconoPlay = true;
+
+        usuarioAutorizadoMarcador = await _servicioAutPlanillero.ExistenciaAutorizacionPlanillero(_servicioTorneo.ObtenerTorneoActual().Id);
+
+    }
+
+    private string ActualizarLinkImagen(string imagenRef)
+    {
+        return $"{_config["UrlBaseParaImagenes"]}{imagenRef}";
+    }
+
+    private string ColorActivo() => Partido.EstadoPartido == Util.EstadoPartido.EN_PROCESO.ToString() ? "color-partido-activo" : "";
+
+    private string EscudoVacio() => "/imagenes/escudovacio.png";
+
+    private string MensajeEsperandoContrincante() => "Esperando...";
+
+    private async Task ComenzarPartido()
+    {
+        if (HabilitacionEquiposPartido())
+        {
+            if (_servicioFixture.HayCanchaLibre())
+            {
+                Partido.EstadoPartido = Util.EstadoPartido.EN_PROCESO.ToString();
+                EsconderIconoPlay = true;
+                ImagenPlay = "pelota.png";
+                Partido.Inicio = DateTime.Now;
+            }
+            else
+            {
+                _snackBar.Add("No hay canchas disopnibles aun", Severity.Info);
+            }
+        }
+        else
+        {
+            _snackBar.Add("Todavia no hay dos equipos confirmados", Severity.Info);
+        }
+        await ActualizarPartidosTiempoReal();
+    }
+
+    private async Task AumentarMarcador(string tipoEquipo)
+    {
+        if(usuarioAutorizadoMarcador)
+        {
+            if (tipoEquipo == "LOCAL")
+            {
+                Partido.MarcadorLocal += 1;
+            }
+            else
+            {
+                Partido.MarcadorVisitante += 1;
+            }
+            bool finalSet = await VerificarFinalSet();
+
+
+            if (finalSet)
+            {
+                Partido.SetGanadosLocal = Partido.MarcadorLocal > Partido.MarcadorVisitante ? Partido.SetGanadosLocal + 1 : Partido.SetGanadosLocal;
+                Partido.SetGanadosVisitante = Partido.MarcadorVisitante > Partido.MarcadorLocal ? Partido.SetGanadosVisitante + 1 : Partido.SetGanadosVisitante;
+                await ResetearMarcador();
+            }
+
+            bool finalPartido = await VerificarFinalPartido();
+            if (finalPartido)
+            {
+                await TerminarPartido();
+
+            }
+            else
+            {
+                await ActualizarPartidosTiempoReal();
+            }
+        }
+    }
+
+    private async Task<bool> VerificarFinalSet()
+    {
+        if (Partido.MarcadorLocal >= puntajeMaximoSegunSet - 1 && Partido.MarcadorVisitante >= puntajeMaximoSegunSet - 1)
+        {
+            if (Math.Abs(Partido.MarcadorLocal - Partido.MarcadorVisitante) == 2) return true;
+        }
+        else
+        {
+            if (Partido.MarcadorLocal >= puntajeMaximoSegunSet || Partido.MarcadorVisitante >= puntajeMaximoSegunSet) return true;
+        }
+        return false;
+    }
+
+
+    private async Task DecrementarMarcador(string tipoEquipo)
+    {
+        if (usuarioAutorizadoMarcador)
+        {
+            if (tipoEquipo == "LOCAL" && Partido.MarcadorLocal > 0)
+            {
+                Partido.MarcadorLocal -= 1;
+            }
+            else if (Partido.MarcadorVisitante > 0)
+            {
+                Partido.MarcadorVisitante -= 1;
+            }
+            await ActualizarPartidosTiempoReal();
+        }
+    }
+
+    private async Task ResetearMarcador()
+    {
+        Partido.HistorialSet += $"[{Partido.MarcadorLocal}-{Partido.MarcadorVisitante}]  ";
+        Partido.MarcadorLocal = 0;
+        Partido.MarcadorVisitante = 0;
+        Partido.SetActual += 1;
+        puntajeMaximoSegunSet = Partido.SetActual == SetsMax ? PuntajeMaxDefinitorio : PuntajeMax;  //resolver esto para tiempo real
+    }
+
+    private async Task<bool> VerificarFinalPartido()
+    {
+        if (Partido.SetActual > SetsMax || Partido.SetGanadosLocal == setDiferencia || Partido.SetGanadosVisitante == setDiferencia) return true;
+
+        return false;
+    }
+
+    private async Task TerminarPartido()
+    {
+        Partido.PuntajeLocal = Partido.SetGanadosLocal > Partido.SetGanadosVisitante ? 2 : 1;
+        Partido.PuntajeVisitante = Partido.SetGanadosVisitante > Partido.SetGanadosLocal ? 2 : 1;
+        Partido.EstadoPartido = Util.EstadoPartido.FINALIZADO.ToString();
+        EsconderIconoPlay = false;
+        Partido.Fin = DateTime.Now;
+        var partidos = await _servicioFixture.TerminoPartido(Partido);
+
+        if (await _servicioFixture.ActualizarPartidoTorneo(Partido))
+        {
+            _snackBar.Add("Partido finalizado y actualizado", Severity.Success);
+        }
+
+        await ActualizarPartidosTermino(partidos);
+    }
+
+    private async Task ActualizarPartidosTiempoReal()
+    {
+        await _servicioFixture.ActualizacionPartidosTiempoReal(new List<PartidoDTO>(){Partido});
+    }
+
+    private async Task ActualizarPartidosTermino(List<PartidoDTO> partidos)
+    {
+        if (partidos.Count > 0) await _servicioFixture.ActualizacionPartidosTiempoReal(partidos);
+
+        await ActualizarPartidosTiempoReal();
+    }
+
+    private string DuracionPartido()
+    {
+        if (Partido.Inicio != DateTime.MinValue && Partido.Fin != DateTime.MinValue)
+        {
+            return $"{Util.TiempoEnMinutos(Partido.Inicio, Partido.Fin)}:00";
+        }
+        return "00:00";
+    }
+
+    private string AdicionalInfoGrupo()
+    {
+        if (!string.IsNullOrEmpty(Partido.Grupo))
+        {
+            return $"Grupo:{Partido.Grupo}";
+        }
+        return "";
+    }
+
+
+    private async Task ComienzoToqueLargo(TouchEventArgs e, string tipoEquipo)
+    {
+        esToqueLArgo = true;
+        toqueLargoTimer = new Timer(EjecucionDecrementador, tipoEquipo, 500, Timeout.Infinite);
+    }
+
+    private void FinToqueLargo()
+    {
+        toqueLargoTimer?.Dispose();
+        esToqueLArgo = false;
+        StateHasChanged();
+    }
+
+    private void EjecucionDecrementador(object state)
+    {
+        string tipoEquipo = state.ToString();
+
+        StateHasChanged();
+        DecrementarMarcador(tipoEquipo).Wait();
+
+        toqueLargoTimer?.Dispose();
+        esToqueLArgo = false;
+    }
+
+    private bool HabilitacionEquiposPartido()
+    {
+        if (Partido.EquipoLocal != null && Partido.EquipoVisitante != null)
+        {
+           if (Partido.EquipoLocal.Id > 0 && Partido.EquipoVisitante.Id > 0){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+
+     private async Task NotificarComienzoAEquipos()
+    {
+        if (HabilitacionEquiposPartido())
+        {
+            if (_servicioFixture.HayCanchaLibre())
+            {
+                bool notificacionsoloAEquipo = false;
+                string mensaje = "Presentarse a jugar en cancha";
+                bool notificadoLocal = await _servicioNotificacion.RegistrarNotificacion(mensaje, Partido.EquipoLocal, _servicioTorneo.ObtenerTorneoActual(), notificacionsoloAEquipo);
+                bool notificadoVisitante = await _servicioNotificacion.RegistrarNotificacion(mensaje, Partido.EquipoVisitante, _servicioTorneo.ObtenerTorneoActual(), notificacionsoloAEquipo);
+
+                if (notificadoLocal && notificadoVisitante)
+                {
+                    _snackBar.Add("Equipos notificados", Severity.Success);
+                }
+            }
+            else
+            {
+                _snackBar.Add("No hay canchas disopnibles aun", Severity.Info);
+            }
+        }
+        else
+        {
+            _snackBar.Add("Todavia no hay dos equipos confirmados", Severity.Info);
+        }
+    }
+
+
+
+
+}

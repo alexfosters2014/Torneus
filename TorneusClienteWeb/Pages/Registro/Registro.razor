@@ -1,0 +1,161 @@
+﻿@page "/Registro"
+@inject ServicioMenu _servicioMenu
+@layout LayoutVacio
+@inject NavigationManager _nav
+@inject ILocalStorageService _localStorage
+@inject UsuarioServicio _usuarioServicio
+@using System.IdentityModel.Tokens.Jwt
+@using System.Text
+@inject ISnackbar _snackbar
+
+
+<div class="background-image">
+
+    <div class="card-registro">
+        <div class="center-container">
+            <img src="/imagenes/logoTorneus.png" alt="" class="logo-login" />
+        </div>
+
+        <EditForm Model="@registroDTO" OnValidSubmit="Registrar">
+            <DataAnnotationsValidator/>
+        <MudTextField @bind-Value="registroDTO.Nombre"
+                      Label="Nombre"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      For="@(() => registroDTO.Nombre)" />
+
+        <MudTextField @bind-Value="registroDTO.Mail"
+                      Label="Email"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      For="@(() => registroDTO.Mail)" />
+
+        <MudTextField @bind-Value="registroDTO.Tel"
+                      Label="Celular"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense"
+                      For="@(() => registroDTO.Tel)" />
+
+
+        <MudTextField @bind-Value="registroDTO.Pass"
+                      Label="Contraseña"
+                      Variant="Variant.Outlined"
+                      InputType="@PasswordInput"
+                      Adornment="Adornment.End"
+                      AdornmentIcon="@PasswordInputIcon"
+                      OnAdornmentClick="ButtonTestclick"
+                      AdornmentAriaLabel="Ver contraseña"
+                      Margin="Margin.Dense"
+                      For="@(() => registroDTO.Pass)" />
+
+        <MudTextField @bind-Value="registroDTO.PassRepeticion"
+                      Label="Repita la contraseña"
+                      Variant="Variant.Outlined"
+                      InputType="@PasswordInput"
+                      Margin="Margin.Dense"
+                      For="@(() => registroDTO.PassRepeticion)" />
+
+
+
+    <MudSelect @bind-Value="@registroDTO.Rol" 
+               Label="Elegir el rol" 
+               Variant="Variant.Outlined"
+               For="@(() => registroDTO.Rol)">
+         @foreach(var rol in Util.RolesDiccionario)
+           {
+            <MudSelectItem Value="rol.Key">
+                        <img src="@rutaIconosSelect(rol.Key)" height="20" class="mr-1" /> SOY @rol.Key
+            </MudSelectItem>
+           }
+    </MudSelect>
+
+
+         <EspacioVertical Altura="20px" />
+        <div class="center-container-login">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Atras">Volver</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Registrarme</MudButton>
+        </div>
+        
+</EditForm>
+
+    </div>
+        @if (cargado)
+        {
+            <Cargando />
+         }
+</div>
+
+
+
+
+@code {
+    public RegistroDTO registroDTO { get; set; } = new();
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    bool cargado = false;
+
+
+    public async Task Registrar()
+    {
+        try
+        {
+            cargado = true;
+            await _usuarioServicio.Registrarme(registroDTO);
+            _snackbar.Add("Registrado con éxito", Severity.Success);
+            var usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+            await _localStorage.SetItemAsync(Utilidades.Util.TOKEN_LOCAL, usuario);
+            Navegar(usuario.Rol);
+        }
+        catch (Exception ex)
+        {
+            cargado = false;
+            _snackbar.Add(ex.Message, Severity.Warning);
+            StateHasChanged();
+        }
+    }
+
+
+    private void EleccionRol(string rol)
+    {
+        registroDTO.Rol = rol;
+    }
+
+
+    private string rutaIconosSelect(string rol)
+    {
+        return $"/imagenes/{rol}.png";
+    }
+
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private void Navegar(string rol)
+    {
+        _nav.NavigateTo($"/{rol}/Principal");
+    }
+
+    private void Atras()
+    {
+        _nav.NavigateTo($"/");
+    }
+
+
+
+}
+

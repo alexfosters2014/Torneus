@@ -1,0 +1,85 @@
+﻿@page "/PartidosTiempoReal"
+@inject ServicioMenu _servicioMenu
+@inject TorneoServicio _servicioTorneo
+@inject FixtureServicio _servicioFixture
+@inject NotificacionesSignalRService _servicioNotificacionesSignalR
+@inject HubConnection _hubConnection;
+@inject UsuarioServicio _servicioUsuario
+@inject IDialogService _dialogService
+
+@if (Partidos == null)
+{
+    <Cargando />
+}
+else
+{
+    if (Partidos.Count > 0)
+    {
+        @foreach (var partido in Partidos)
+        {
+            <PartidoMarcador Partido="partido" SiguientePartido="SiguientePartido" />
+        }
+
+        <span class="posicionTiempoProm globo-propiedad">Tiempo prom. partidos: @_servicioFixture.TiempoPromedioMinutos min</span>
+
+        @if (_servicioFixture.HayEtapaGrupos())
+        {
+            <MudFab Style="@_servicioMenu.ClassFabColor()" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Large" OnClick="VerTablaPosiciones" />
+        }
+     
+    }
+    else
+    {
+        <h3>No tiene ningun partido para puntuar</h3>
+    }
+}
+
+
+
+@code {
+    List<PartidoDTO> Partidos;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CargaInicial();
+    }
+
+    private async Task CargaInicial()
+    {
+        Partidos = _servicioFixture.ObtenerPartidos();
+        await _servicioFixture.CrearTablaPosiciones();
+        await _servicioFixture.ActualizarTiempoPromedioPartidos();
+        _servicioFixture.OnActualizarPartidosEvent += Actualizar;
+
+        _hubConnection.On<List<PartidoDTO>>("RecibirActualizarPartidos", async (partidos) =>
+      {
+          await _servicioNotificacionesSignalR.ActualizarPartidosSignalR(partidos);
+      });
+    }
+
+    private void SiguientePartido()
+    {
+
+    }
+
+    private void Actualizar()
+    {
+        Partidos = _servicioFixture.ObtenerPartidos();
+        StateHasChanged();
+    }
+
+
+    private async Task VerTablaPosiciones()
+    {
+        var result = await _dialogService.Show<TablaPosicionesGrupo>("Tabla de posiciones.").Result;
+    }
+
+
+
+
+
+
+
+
+
+}

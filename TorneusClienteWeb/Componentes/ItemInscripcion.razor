@@ -1,0 +1,97 @@
+﻿@inject InscripcionServicio _servicioInscripcion
+@inject UsuarioServicio _servicioUsuario
+@inject IDialogService _dialogService
+@inject ISnackbar _snackBar
+
+
+<section class="card-general card-general-relativo">
+    <article class="d-flex justify-content-center align-items-center flex-column">
+        <span>@TituloSegunRol()</span>
+        <span>$ @InscripcionDTO.Monto</span>
+    </article>
+
+    <article class="card-general-encabezado">
+        <img src="@UrlMedioPago()" alt="">
+    </article>
+
+    <article class="card-general-pie" style="background-color: @colorEstadoPago()">
+        <span>@InscripcionDTO.Estado.ToUpper()</span>
+    </article>
+
+    @if (rolUsuario == Util.Roles.EQUIPO.ToString())
+    {
+        <button @onclick="BajaInscripcion"><span class="fas fa-trash-alt flotando-izquierda"></span></button>
+    }
+
+    @if (rolUsuario == Util.Roles.ORGANIZADOR.ToString() && InscripcionDTO.Estado != Util.EstadoPago.PAGADO.ToString())
+    {
+        <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda"></span></button>
+    }
+</section>
+
+
+
+@code {
+    [Parameter]
+    public InscripcionDTO InscripcionDTO { get; set; }
+
+    [Parameter]
+    public EventCallback ActualizarListado { get; set; }
+
+    private string rolUsuario = "";
+
+    private string UrlMedioPago()
+    {
+        return $"/imagenes/mediopago_{InscripcionDTO.MedioPago}.png";
+    }
+
+    private string colorEstadoPago()
+    {
+        return Util.ColorEstadoPAgo[InscripcionDTO.Estado];
+    }
+
+    private async Task BajaInscripcion()
+    {
+        try
+        {
+            var result = await _dialogService.Show<DialogComponent>("Deseas dar de baja tu inscripción a este torneo?").Result;
+
+            if (result.Canceled) return;
+
+            bool resultado = await _servicioInscripcion.BajaInscripcion(InscripcionDTO.Id);
+
+            _snackBar.Add("Se ha dado de baja correctamente", Severity.Success);
+            await ActualizarListado.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            _snackBar.Add(ex.Message, Severity.Warning);
+        }
+
+    }
+
+    private string TituloSegunRol()
+    {
+        rolUsuario = _servicioUsuario.ObtenerUsuarioLogueado().Rol;
+
+        string titulo = rolUsuario == Util.Roles.ORGANIZADOR.ToString() ? InscripcionDTO.Equipo.Nombre : InscripcionDTO.Torneo.Nombre;
+
+        return titulo;
+    }
+
+    private async Task ConfirmacionCobro()
+    {
+        var result = await _dialogService.Show<DialogComponent>("Lo cobra en efectivo?").Result;
+
+        if (result.Canceled) return;
+
+        _servicioInscripcion.SetInscripcionSeleccionado(InscripcionDTO.Id);
+        bool resultado = await _servicioInscripcion.ActualizarMedioPagoEfectivo(Util.EstadoPago.PAGADO.ToString());
+
+        _snackBar.Add("Se ha cambiado su estado correctamente", Severity.Success);
+        //StateHasChanged();
+    }
+
+
+
+}

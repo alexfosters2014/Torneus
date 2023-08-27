@@ -1,0 +1,150 @@
+﻿@page "/"
+@inject ServicioMenu _servicioMenu
+@layout LayoutVacio
+@inject NavigationManager _nav
+@inject ILocalStorageService _localStorage
+@inject UsuarioServicio _usuarioServicio
+@using System.IdentityModel.Tokens.Jwt
+@using System.Text
+@inject ISnackbar _snackbar
+
+
+
+
+<div class="background-image">
+
+    <div class="card-login">
+        <div class="center-container-logo">
+            <img src="/imagenes/logoTorneus.png" alt="" class="logo-login" />
+        </div>
+       
+        
+        <Boton BackGroungColor="#e0e0e0" ButtonText="Voy a iniciar con Google" ImageUrl="/imagenes/google.png" />
+
+        <EditForm Model="@UsuarioLogin" OnValidSubmit="Loguearme">
+                    <DataAnnotationsValidator/>
+
+            <MudTextField @bind-Value="UsuarioLogin.Mail"
+                              Label="Usuario"
+                              Variant="Variant.Outlined"
+                              Margin="Margin.Dense"
+                          For="@(() => UsuarioLogin.Mail)" />
+
+            <EspacioVertical Altura="7px" />
+
+            <MudTextField @bind-Value="UsuarioLogin.Pass"
+                              Label="Contraseña"
+                              Variant="Variant.Outlined"
+                              InputType="@PasswordInput"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@PasswordInputIcon"
+                              OnAdornmentClick="ButtonTestclick"
+                              AdornmentAriaLabel="Ver contraseña"
+                              Margin="Margin.Dense"
+                          For="@(() => UsuarioLogin.Pass)" />
+
+                          <EspacioVertical Altura="12px" />
+                    <div class="center-container-login">
+                          <MudButton Variant="Variant.Filled" Color="Color.Primary" ButtonType="ButtonType.Submit">Loguearme</MudButton>
+                    </div>
+        </EditForm>
+
+        <div class="link-derecha">
+            <a href="" @onclick="Registrar" @onclick:preventDefault>Registrate aqui!! </a>
+        </div>
+
+        <div class="link-medio">
+            <a href="" class="link-login">Me olvidé de mi contraseña!!</a>
+        </div>
+        
+       
+    </div>
+
+    @if (cargado)
+    {
+        <Cargando />
+    }
+
+</div>
+
+
+
+@code{
+    public LoginDTO UsuarioLogin { get; set; } = new();
+    private bool cargado = false;
+
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    protected async override Task OnInitializedAsync()
+    {
+        UsuarioLogueado usuario = await _localStorage.GetItemAsync<UsuarioLogueado>(Util.TOKEN_LOCAL);
+        if (usuario != null)
+        {
+            _usuarioServicio.ActualizarUsuarioLogueado(usuario);
+            Navegar(usuario.Rol);
+        }
+    }
+    public async void Loguearme()
+    {
+        try
+
+        {
+            cargado = true;
+            bool respuesta = await _usuarioServicio.Loguearme(UsuarioLogin);
+            var usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+            await _localStorage.SetItemAsync(Utilidades.Util.TOKEN_LOCAL, usuario);
+            _snackbar.Add("Sesión iniciada", Severity.Success);
+            Navegar(usuario.Rol);
+        }
+        catch (Exception ex)
+        {
+             cargado = false;
+            _snackbar.Add(ex.Message, Severity.Warning);
+            StateHasChanged();
+        }
+        
+
+
+    }
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+
+    private void Navegar(string rol)
+    {
+        if (rol == Util.Roles.PLANILLERO.ToString() || rol == Util.Roles.ESPECTADOR.ToString())
+        {
+            _nav.NavigateTo($"/GENERAL/Principal");
+        }
+        else
+        {
+            _nav.NavigateTo($"/{rol}/Principal");
+        }
+       
+    }
+
+    private void Registrar()
+    {
+        _nav.NavigateTo("/Registro");
+    }
+
+
+       
+}
+
