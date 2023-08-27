@@ -148,13 +148,15 @@
         int PuntajeMaxDefinitorio = torneoActual.PuntajeMaxUltimoSet;
         int TorneoId = torneoActual.Id;
 
+        int usuarioId = _servicioUsuario.ObtenerUsuarioLogueado().Id;
+
         decimal mitadSetTotales = Math.Round(Convert.ToDecimal(SetsMax) / 2, 2);
         setDiferencia = (int)Math.Ceiling(mitadSetTotales);
 
         puntajeMaximoSegunSet = PuntajeMax;
         if (Partido.PuntajeLocal > 0 || Partido.PuntajeVisitante > 0) EsconderIconoPlay = true;
 
-        usuarioAutorizadoMarcador = await _servicioAutPlanillero.ExistenciaAutorizacionPlanillero(_servicioTorneo.ObtenerTorneoActual().Id);
+        usuarioAutorizadoMarcador = await _servicioAutPlanillero.ExistenciaAutorizacionPlanillero(usuarioId, TorneoId);
 
     }
 

@@ -132,9 +132,9 @@ namespace TorneusClienteWeb.Servicios
             }
         }
 
-        public async Task<bool> ExistenciaAutorizacionPlanillero(int torneoId)
+        public async Task<bool> ExistenciaAutorizacionPlanillero(int usuarioId, int torneoId)
         {
-            return AutorizacionPlanilleros.Any(a => a.TorneoId == torneoId);
+            return AutorizacionPlanilleros.Any(a => a.TorneoId == torneoId && a.UsuarioIdPlanillero == usuarioId);
         }
 
 
