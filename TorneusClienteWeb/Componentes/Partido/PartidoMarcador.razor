@@ -76,7 +76,7 @@
             <EspacioVertical Altura="20px" />
         }
 
-        @if (usuarioAutorizadoMarcador)
+        @if (UsuarioAutorizadoMarcador)
         {
             @if (Partido.EquipoLocal != null && Partido.EquipoVisitante != null && Partido.EstadoPartido == Util.EstadoPartido.PENDIENTE.ToString())
             {
@@ -117,7 +117,7 @@
     int TorneoId = 0;
 
     [Parameter]
-    public EventCallback<PartidoDTO> SiguientePartido { get; set; }
+    public bool UsuarioAutorizadoMarcador { get; set; }
 
     private int setDiferencia = 0;
     private int puntajeMaximoSegunSet = 0;
@@ -129,14 +129,20 @@
     private DateTime HorarioInicioPartido;
 
     private bool touchLargoCorriendo = false;
-    private bool usuarioAutorizadoMarcador = false;
 
     private bool esToqueLArgo = false;
     private Timer toqueLargoTimer;
 
+
+
+
+
+
     protected async override Task OnInitializedAsync()
     {
         await Iniciar();
+
+
     }
 
     private async Task Iniciar()
@@ -148,15 +154,11 @@
         int PuntajeMaxDefinitorio = torneoActual.PuntajeMaxUltimoSet;
         int TorneoId = torneoActual.Id;
 
-        int usuarioId = _servicioUsuario.ObtenerUsuarioLogueado().Id;
-
         decimal mitadSetTotales = Math.Round(Convert.ToDecimal(SetsMax) / 2, 2);
         setDiferencia = (int)Math.Ceiling(mitadSetTotales);
 
         puntajeMaximoSegunSet = PuntajeMax;
         if (Partido.PuntajeLocal > 0 || Partido.PuntajeVisitante > 0) EsconderIconoPlay = true;
-
-        usuarioAutorizadoMarcador = await _servicioAutPlanillero.ExistenciaAutorizacionPlanillero(usuarioId, TorneoId);
 
     }
 
@@ -196,7 +198,7 @@
 
     private async Task AumentarMarcador(string tipoEquipo)
     {
-        if(usuarioAutorizadoMarcador)
+        if (UsuarioAutorizadoMarcador)
         {
             if (tipoEquipo == "LOCAL")
             {
@@ -245,7 +247,7 @@
 
     private async Task DecrementarMarcador(string tipoEquipo)
     {
-        if (usuarioAutorizadoMarcador)
+        if (UsuarioAutorizadoMarcador)
         {
             if (tipoEquipo == "LOCAL" && Partido.MarcadorLocal > 0)
             {

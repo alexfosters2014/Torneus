@@ -4,6 +4,7 @@
 @inject AutPlanilleroServicio _servicioAutorizacionPlanillero
 @inject UsuarioServicio _servicioUsuario
 @inject ISnackbar _snackbar
+@inject HubConnection _hubConnection
 
 @if (PlanillerosTorneosGrupos == null)
 { 
@@ -81,6 +82,7 @@ else
             {
                 await ActualizarListado();
                 _snackbar.Add("Usuario planillero autorizado correctamente", Severity.Success);
+                await EnviarPermisoTiempoReal(planilleroAAgregar.UsuarioIdPlanillero, planilleroAAgregar.TorneoId);
             }
         }
         catch (Exception ex)
@@ -105,6 +107,7 @@ else
             {
                 await ActualizarListado();
                 _snackbar.Add("Autorización eliminada correctamente", Severity.Success);
+                await EnviarPermisoTiempoReal(planillero.UsuarioIdPlanillero, planillero.TorneoId);
             }
         }
         catch (Exception ex)
@@ -112,6 +115,11 @@ else
             _snackbar.Add(ex.Message, Severity.Warning);
         }
 
+    }
+
+    private async Task EnviarPermisoTiempoReal(int usuarioId, int torneoId)
+    {
+        await _hubConnection.SendAsync("EnviarAccesoPlanillero", usuarioId, torneoId);
     }
 
 

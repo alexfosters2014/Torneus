@@ -86,7 +86,10 @@ namespace WebApiTorneus.HubSignalR
             await Clients.All.SendAsync("RecibirNuevaNotificacion", notificacion);
         }
 
-
+        public async Task EnviarAccesoPlanillero(int usuarioId, int torneoId)
+        {
+            await Clients.All.SendAsync("RecibirAccesoPlanillero", usuarioId, torneoId);
+        }
 
 
     }
