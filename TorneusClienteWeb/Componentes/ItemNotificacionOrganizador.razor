@@ -1,0 +1,31 @@
+﻿
+@if (Notificacion != null)
+{
+    <section class="card-general card-general-relativo2 @ClaseGeneralColorMensaje()">
+
+          <article class="d-flex justify-content-end">
+            <span class="fechahora">@Notificacion.FechaHora.ToString("dd/MM/yyy HH:mm")</span>
+        </article>
+
+        <article>
+            <span class="letra-oscura">@Notificacion.Mensaje</span>
+        </article>
+
+        <span class="card-general-encabezado2 @ClaseEquipoColorTitulo()">@DirigidoA()</span>
+
+    </section>
+
+}
+
+
+
+@code {
+    [Parameter]
+    public NotificacionDTO Notificacion { get; set; }
+
+    private string ClaseGeneralColorMensaje() => Notificacion.General ? "notify-general-verde" : "notify-general-violeta";
+
+    private string ClaseEquipoColorTitulo() => Notificacion.General ? "gradiente-verde" : "gradiente-violeta";
+
+    private string DirigidoA() => Notificacion.General ? "General" : "Equipos";
+}
