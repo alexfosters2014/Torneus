@@ -10,6 +10,8 @@ namespace TorneusClienteWeb.Servicios
         List<AutorizacionPlanilleroDTO> AutorizacionPlanilleros = new();
 
         private readonly AutPlanilleroServicioDatos _autPlanilleroServicioDatos;
+
+        public event Action OnActualizarExistenciaAutPlanilleroEvent;
         public AutPlanilleroServicio(AutPlanilleroServicioDatos autPlanilleroServicioDatos)
         {
             _autPlanilleroServicioDatos = autPlanilleroServicioDatos;
@@ -42,25 +44,15 @@ namespace TorneusClienteWeb.Servicios
 
         public async Task<List<AutorizacionPlanilleroDTO>> ObtenerAutorizaciones(UsuarioLogueado usuarioLogueado)
         {
-            if (AutorizacionPlanilleros.Count > 0)
+            if (usuarioLogueado.Rol == Util.Roles.PLANILLERO.ToString())
             {
-                return AutorizacionPlanilleros;
+                await ObtenerAutorizacionesMarcacionesParaPlanilleros(usuarioLogueado.Id);
             }
-            else
+            if (usuarioLogueado.Rol == Util.Roles.ORGANIZADOR.ToString())
             {
-                if (usuarioLogueado != null)
-                {
-                    if (usuarioLogueado.Rol == Util.Roles.PLANILLERO.ToString())
-                    {
-                        await ObtenerAutorizacionesMarcacionesParaPlanilleros(usuarioLogueado.Id);
-                    }
-                    if (usuarioLogueado.Rol == Util.Roles.ORGANIZADOR.ToString())
-                    {
-                        await ObtenerAutorizacionesMarcacionesParaOrganizadores(usuarioLogueado.Id);
-                    }
-                }
-                return AutorizacionPlanilleros;
+                await ObtenerAutorizacionesMarcacionesParaOrganizadores(usuarioLogueado.Id);
             }
+            return AutorizacionPlanilleros;
         }
 
 

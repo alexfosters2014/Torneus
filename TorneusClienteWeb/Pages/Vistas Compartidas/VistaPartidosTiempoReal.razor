@@ -5,6 +5,7 @@
 @inject NotificacionesSignalRService _servicioNotificacionesSignalR
 @inject HubConnection _hubConnection;
 @inject UsuarioServicio _servicioUsuario
+@inject AutPlanilleroServicio _servicioAutPlanillero
 @inject IDialogService _dialogService
 
 @if (Partidos == null)
@@ -17,7 +18,7 @@ else
     {
         @foreach (var partido in Partidos)
         {
-            <PartidoMarcador Partido="partido" SiguientePartido="SiguientePartido" />
+            <PartidoMarcador Partido="partido" UsuarioAutorizadoMarcador="UsuarioAutorizadoMarcadorPlanillero" />
         }
 
         <span class="posicionTiempoProm globo-propiedad">Tiempo prom. partidos: @_servicioFixture.TiempoPromedioMinutos min</span>
@@ -39,6 +40,8 @@ else
 @code {
     List<PartidoDTO> Partidos;
 
+    private bool UsuarioAutorizadoMarcadorPlanillero = false;
+
     protected async override Task OnInitializedAsync()
     {
         await CargaInicial();
@@ -51,15 +54,33 @@ else
         await _servicioFixture.ActualizarTiempoPromedioPartidos();
         _servicioFixture.OnActualizarPartidosEvent += Actualizar;
 
+        await ActualizarUsuarioAutorizadoMarcador();
+
         _hubConnection.On<List<PartidoDTO>>("RecibirActualizarPartidos", async (partidos) =>
       {
           await _servicioNotificacionesSignalR.ActualizarPartidosSignalR(partidos);
       });
+
+        _hubConnection.On<int,int>("RecibirAccesoPlanillero", async (usuarioId,torneoId) =>
+     {
+         var usuarioLogueado = _servicioUsuario.ObtenerUsuarioLogueado();
+         var torneo = _servicioTorneo.ObtenerTorneoActual();
+
+         if (usuarioLogueado.Id == usuarioId && torneo.Id == torneoId)
+         {
+             await _servicioAutPlanillero.ObtenerAutorizaciones(usuarioLogueado);
+             await ActualizarUsuarioAutorizadoMarcador();
+         }
+     });
+
     }
 
-    private void SiguientePartido()
+    private async Task ActualizarUsuarioAutorizadoMarcador()
     {
-
+        int torneoActualId = _servicioTorneo.ObtenerTorneoActual().Id;
+        int usuarioId = _servicioUsuario.ObtenerUsuarioLogueado().Id;
+        UsuarioAutorizadoMarcadorPlanillero = await _servicioAutPlanillero.ExistenciaAutorizacionPlanillero(usuarioId, torneoActualId);
+        StateHasChanged();
     }
 
     private void Actualizar()
