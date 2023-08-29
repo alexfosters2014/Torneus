@@ -2,14 +2,18 @@
 @inject IDialogService _dialogService
 @inject ISnackbar _snackBar
 
-<div>
-    <MudTextField @bind-Value="mensaje"
-                  Label="Escribe tu mensaaje"
-                  Variant="Variant.Outlined"
-                  Margin="Margin.Dense" />
-    <button @onclick="EnviarMensaje">
-        <img src="/imagenes/enviarNotificacion.png" class="imgCampana" alt="" />
-    </button>
+<div class="row  d-flex align-items-center fixed-input-notificacion">
+    <div class="col-11">
+        <MudTextField @bind-Value="mensaje"
+                      Label="Escribe tu mensaaje"
+                      Variant="Variant.Outlined"
+                      Margin="Margin.Dense" />
+    </div>
+    <div class="col-1 margen-izq-superpuesto">
+        <button @onclick="EnviarMensaje">
+            <img src="/imagenes/enviarNotificacion.png" class="imgEnvioMensaje" alt="" />
+        </button>
+    </div>
 </div>
 @code {
 

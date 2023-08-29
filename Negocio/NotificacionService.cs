@@ -95,7 +95,31 @@ namespace Negocio
             }
         }
 
+        public async Task<List<Notificacion>> ObtenerSegunUsuarioOrganizador(UsuarioLogueado usuario)
+        {
 
+
+            List<Notificacion> notificaciones = new List<Notificacion>();
+            List<Notificacion> notificacionesFiltrados = new();
+
+
+            try
+            {
+                var notificacionGeneral = await _db.Notificaciones.Include(i => i.Torneo)
+                                                                  .Include(i => i.Equipo)
+                                                                  .Where(w => w.Torneo.Id == usuario.Id)
+                                                                  .ToListAsync();
+
+
+
+                notificacionesFiltrados = notificaciones.OrderBy(w => w.FechaHora).ToList();
+                return notificaciones;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task<bool> BorrarNotificacionesTerminoPartido(int torneoId)
         {

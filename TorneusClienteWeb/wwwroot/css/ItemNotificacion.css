@@ -83,3 +83,13 @@
     border-radius: 10px;
     padding: 3px;
 }
+
+.margen-izq-superpuesto {
+    margin-left: -40px;
+}
+
+.fixed-input-notificacion{
+    position: fixed;
+    bottom: 80px;
+    width: 96%;
+}

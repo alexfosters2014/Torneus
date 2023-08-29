@@ -71,7 +71,21 @@ namespace TorneusClienteWeb.Servicios
             {
                 UsuarioLogueado usuario = _usuarioServicio.ObtenerUsuarioLogueado();
                 Notificaciones = await _notificacionServicioDatos.ObtenerListadoNotificaciones(usuario);
-                Notificaciones = Notificaciones.OrderByDescending(o => o.FechaHora).ToList();
+                return Notificaciones;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        public async Task<List<NotificacionDTO>> ObtenerNotificacionesOrganizador()
+        {
+            try
+            {
+                UsuarioLogueado usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+                Notificaciones = await _notificacionServicioDatos.ObtenerListadoNotificacionesOrganizador(usuario);
                 return Notificaciones;
             }
             catch (Exception ex)
