@@ -1,0 +1,47 @@
+﻿@inject NotificacionServicio _servicioNotificacion
+@inject IDialogService _dialogService
+@inject ISnackbar _snackBar
+
+<div>
+    <MudTextField @bind-Value="mensaje"
+                  Label="Escribe tu mensaaje"
+                  Variant="Variant.Outlined"
+                  Margin="Margin.Dense" />
+    <button @onclick="EnviarMensaje">
+        <img src="/imagenes/enviarNotificacion.png" class="imgCampana" alt="" />
+    </button>
+</div>
+@code {
+
+    private string mensaje = "";
+
+    private async Task EnviarMensaje()
+    {
+        try
+        {
+            var result = await _dialogService.Show<EleccionTipoNotificacion>("Selección tipo de notificación").Result;
+
+            if (result.Canceled) return;
+
+            var nuevaNotificacoin = (NotificacionDTO)result.Data;
+            nuevaNotificacoin.Mensaje = mensaje;
+
+            bool registradoYNotificado = await _servicioNotificacion.RegistrarNotificacion(nuevaNotificacoin);
+
+            if (registradoYNotificado)
+            {
+                _snackBar.Add("Notificación enviada", Severity.Success);
+            }
+            else
+            {
+                _snackBar.Add("No se ha podido enviar su notificación", Severity.Warning);
+            }
+        }
+        catch (Exception)
+        {
+            
+            throw;
+        }
+    }
+
+}

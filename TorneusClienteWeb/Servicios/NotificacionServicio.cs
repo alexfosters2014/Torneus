@@ -17,7 +17,7 @@ namespace TorneusClienteWeb.Servicios
 
         private List<NotificacionDTO> Notificaciones = new();
 
-        private bool cargadasNotificaciones = false;
+        public event Action OnActualizarListadoNotificacionesEnviadasEvent;
 
         public NotificacionServicio(NotificacionServicioDatos notificacionServicioDatos, UsuarioServicio usuarioServicio, HubConnection hubConnection)
         {
@@ -40,6 +40,22 @@ namespace TorneusClienteWeb.Servicios
                 NotificacionDTO registrado = await _notificacionServicioDatos.RegistrarNotificacion(notificacion);
 
                 await _hubConnection.SendAsync("EnviarNuevaNotificacion", registrado);
+                return registrado != null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<bool> RegistrarNotificacion(NotificacionDTO notificacion)
+        {
+            try
+            {
+                NotificacionDTO registrado = await _notificacionServicioDatos.RegistrarNotificacion(notificacion);
+
+                await _hubConnection.SendAsync("EnviarNuevaNotificacion", registrado);
+                OnActualizarListadoNotificacionesEnviadasEvent?.Invoke();
                 return registrado != null;
             }
             catch (Exception ex)

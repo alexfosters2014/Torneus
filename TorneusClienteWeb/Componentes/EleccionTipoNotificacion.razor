@@ -1,0 +1,88 @@
+﻿@inject TorneoServicio _servicioTorneo
+@inject ISnackbar _snackBar
+
+<MudDialog>
+    <DialogContent>
+
+
+
+
+        <div>
+            <button @onclick="SeleccionGeneral" class="@claseSeleccionGeneral">General</button>
+            <button @onclick="SeleccionEquipos" class="@claseSeleccionEquipos">Equipos</button>
+
+            <EspacioVertical Altura="5px" />
+
+            <MudSelect @bind-Value="@torneoId"
+                       Label="Elegir torneo"
+                       Variant="Variant.Outlined">
+                @foreach (var torneo in TorneosVigentes)
+                {
+                    <MudSelectItem Value="torneo.Id"> @torneo.Nombre </MudSelectItem>
+                }
+            </MudSelect>
+
+        </div>
+
+
+
+
+        <EspacioVertical Altura="10px" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="OK">OK</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="Cerrar">Cancelar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private List<TorneoDTO> TorneosVigentes = new();
+    private NotificacionDTO notificacion = new();
+
+    private int  torneoId = 0;
+    private bool dirigidoAGeneral = false;
+
+    private string claseSeleccionGeneral = "solid-seleccion";
+    private string claseSeleccionEquipos = "outline-seleccion";
+
+    protected async override Task OnInitializedAsync()
+    {
+        TorneosVigentes = await _servicioTorneo.ObtenerTorneosVigentes();
+    }
+
+    private void Cerrar() => MudDialog.Cancel();
+    private void OK(){
+        if (torneoId < 1)
+        {
+            _snackBar.Add("Debe seleccionar un torneo", Severity.Warning);
+            return;
+        }
+        notificacion.Torneo = TorneosVigentes.SingleOrDefault(s => s.Id == torneoId);
+        notificacion.General = dirigidoAGeneral;
+        MudDialog.Close(DialogResult.Ok(notificacion));
+    }
+       
+
+    private void SeleccionGeneral()
+    {
+        dirigidoAGeneral = true;
+        claseSeleccionGeneral = "solid-seleccion";
+        claseSeleccionEquipos = "outline-seleccion";
+    }
+    private void SeleccionEquipos()
+    {
+
+        dirigidoAGeneral = false;
+        claseSeleccionGeneral = "outline-seleccion";
+        claseSeleccionEquipos = "solid-seleccion";
+    }
+
+
+
+
+}
