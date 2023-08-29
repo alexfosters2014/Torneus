@@ -32,7 +32,15 @@ namespace Negocio
                 notificacion.FechaHora = DateTime.Now;
 
                 _db.Entry(notificacion.Torneo).State = EntityState.Unchanged;
+                if (notificacion.Equipo != null)
+                {
                 _db.Entry(notificacion.Equipo).State = EntityState.Unchanged;
+                }
+                else
+                {
+                    notificacion.Equipo = null;
+                    notificacion.EquipoId = null;
+                }
 
                 var registrado = await _db.Notificaciones.AddAsync(notificacion);
                 await _db.SaveChangesAsync();

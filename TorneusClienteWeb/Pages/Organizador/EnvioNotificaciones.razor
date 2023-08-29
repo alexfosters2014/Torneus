@@ -1,5 +1,6 @@
 ﻿@page "/ORGANIZADOR/EnvioNotificaciones"
 @inject NotificacionServicio _servicioNotificacion
+@inject ISnackbar _snackBar
 
 
 @foreach (var notificacion in Notificaciones)
@@ -17,12 +18,16 @@
     protected async override Task OnInitializedAsync()
     {
         _servicioNotificacion.OnActualizarListadoNotificacionesEnviadasEvent += Actualizar;
-        Notificaciones = await _servicioNotificacion.ObtenerNotificacionesOrganizador();
+        Actualizar();
     }
 
-    private void Actualizar()
+    private async void Actualizar()
     {
-        //pedir listado de notificaiones enviadas
+        Notificaciones = await _servicioNotificacion.ObtenerNotificacionesOrganizador();
         StateHasChanged();
     }
+
+
+
+
 }
