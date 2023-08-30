@@ -2,7 +2,9 @@
 @inject IDialogService _dialogService
 @inject ISnackbar _snackBar
 
-<div class="row  d-flex align-items-center fixed-input-notificacion">
+
+
+<div class="row  d-flex align-items-center fixed-input-notificacion" style="background-color:white">
     <div class="col-11">
         <MudTextField @bind-Value="mensaje"
                       Label="Escribe tu mensaaje"
@@ -15,6 +17,10 @@
         </button>
     </div>
 </div>
+
+
+
+
 @code {
 
     private string mensaje = "";
@@ -35,6 +41,7 @@
             if (registradoYNotificado)
             {
                 _snackBar.Add("Notificación enviada", Severity.Success);
+                mensaje = "";
             }
             else
             {

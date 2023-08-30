@@ -85,7 +85,8 @@ namespace Negocio
                     {
                         notificacionesEquipo = await _db.Notificaciones.Include(i => i.Torneo)
                                                                   .Include(i => i.Equipo)
-                                                                  .Where(w => listaIdTorneos.Contains(w.Torneo.Id))
+                                                                  .Where(w => listaIdTorneos.Contains(w.Torneo.Id) || 
+                                                                          (w.Equipo == null && w.General == false))
                                                                   .ToListAsync();
                     }
 
@@ -105,23 +106,20 @@ namespace Negocio
 
         public async Task<List<Notificacion>> ObtenerSegunUsuarioOrganizador(UsuarioLogueado usuario)
         {
-
-
-            List<Notificacion> notificaciones = new List<Notificacion>();
-            List<Notificacion> notificacionesFiltrados = new();
-
-
             try
             {
-                var notificacionGeneral = await _db.Notificaciones.Include(i => i.Torneo)
+                List<Notificacion> notificaciones = new List<Notificacion>();
+                List<Notificacion> notificacionesFiltrados = new();
+
+                notificaciones = await _db.Notificaciones.Include(i => i.Torneo.Usuario)
                                                                   .Include(i => i.Equipo)
-                                                                  .Where(w => w.Torneo.Id == usuario.Id)
+                                                                  .Where(w => w.Torneo.Usuario.Id == usuario.Id)
                                                                   .ToListAsync();
 
 
 
                 notificacionesFiltrados = notificaciones.OrderBy(w => w.FechaHora).ToList();
-                return notificaciones;
+                return notificacionesFiltrados;
             }
             catch (Exception ex)
             {

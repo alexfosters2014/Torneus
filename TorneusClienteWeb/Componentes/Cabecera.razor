@@ -28,19 +28,22 @@
             <span>@_servicioMenu.Titulo</span>
         </div>
     </section>
-
-    @if (_servicioMenu.nuevaNotificacion)
+    @if (EsUsuarioNoOrganizador())
     {
-        <button class="menu-button" @onclick="NotificacionLeida">
-            <img src="/imagenes/campana.gif" alt="Campana" class="imgCampana" />
-        </button>
+        @if (_servicioMenu.nuevaNotificacion)
+        {
+            <button class="menu-button" @onclick="NotificacionLeida">
+                <img src="/imagenes/campana.gif" alt="Campana" class="imgCampana" />
+            </button>
+        }
+        else
+        {
+            <button class="menu-button" @onclick="NotificacionLeida">
+                <i class="fas fa-bell size-icon"></i>
+            </button>
+        }
     }
-    else
-    {
-        <button class="menu-button" @onclick="NotificacionLeida">
-            <i class="fas fa-bell size-icon"></i>
-        </button>
-    }
+   
 </div>
 
 
@@ -85,5 +88,10 @@
     {
         _servicioMenu.nuevaNotificacion = false;
         _nav.NavigateTo("/VistaNotificaciones");
+    }
+
+    private bool EsUsuarioNoOrganizador()
+    {
+        return _usuarioServicio.ObtenerUsuarioLogueado().Rol != Util.Roles.ORGANIZADOR.ToString();
     }
 }
