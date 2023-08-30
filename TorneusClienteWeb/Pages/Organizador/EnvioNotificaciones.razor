@@ -1,0 +1,34 @@
+﻿@page "/ORGANIZADOR/EnvioNotificaciones"
+@inject NotificacionServicio _servicioNotificacion
+@inject ISnackbar _snackBar
+
+
+@foreach (var notificacion in Notificaciones)
+{
+    <ItemNotificacionOrganizador Notificacion="notificacion" />
+}
+
+<EspacioVertical Altura="80px" />
+<div>
+    <ItemNotificacionInput />
+</div>
+
+@code {
+    private List<NotificacionDTO> Notificaciones = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        _servicioNotificacion.OnActualizarListadoNotificacionesEnviadasEvent += Actualizar;
+        Actualizar();
+    }
+
+    private async void Actualizar()
+    {
+        Notificaciones = await _servicioNotificacion.ObtenerNotificacionesOrganizador();
+        StateHasChanged();
+    }
+
+
+
+
+}

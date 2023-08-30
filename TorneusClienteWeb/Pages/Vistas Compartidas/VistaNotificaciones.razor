@@ -11,7 +11,7 @@
     {
         @foreach(var notificacion in Notificaciones)
         {
-            <ItemNotificacion Notificacion="notificacion" />
+            <ItemNotificacion Notificacion="notificacion"/>
         }
     }
     else
@@ -31,22 +31,38 @@ else
     protected async override Task OnInitializedAsync()
     {
 
-        await Actualizar();
-
         _hubConnection.On<NotificacionDTO>("RecibirNuevaNotificacion", async (notificacion) =>
        {
-       if (notificacion.General || notificacion.Equipo.UsuarioId == _servicioUsuario.ObtenerUsuarioLogueado().Id)
-       {
-               await Actualizar();
-               StateHasChanged();
+           var usuarioLogueado = _servicioUsuario.ObtenerUsuarioLogueado();
+
+
+           if (notificacion.General)
+           {
+               Actualizar();
            }
+
+       if (notificacion.Equipo != null)
+       {
+           if (!notificacion.General && notificacion.Equipo.UsuarioId == usuarioLogueado.Id)
+           {
+               Actualizar();
+           }  
+       }
+
+           if (!notificacion.General && notificacion.Equipo == null && usuarioLogueado.Rol == Util.Roles.EQUIPO.ToString())
+           {
+               Actualizar();
+           }
+
        });
 
+        Actualizar();
     }
 
-    private async Task Actualizar()
+    private async void Actualizar()
     {
         Notificaciones = await _servicioNotificaciones.ObtenerNotificaciones();
+        StateHasChanged();
     }
 }
 

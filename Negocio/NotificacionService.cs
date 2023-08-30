@@ -32,7 +32,15 @@ namespace Negocio
                 notificacion.FechaHora = DateTime.Now;
 
                 _db.Entry(notificacion.Torneo).State = EntityState.Unchanged;
+                if (notificacion.Equipo != null)
+                {
                 _db.Entry(notificacion.Equipo).State = EntityState.Unchanged;
+                }
+                else
+                {
+                    notificacion.Equipo = null;
+                    notificacion.EquipoId = null;
+                }
 
                 var registrado = await _db.Notificaciones.AddAsync(notificacion);
                 await _db.SaveChangesAsync();
@@ -76,9 +84,10 @@ namespace Negocio
                     if (listaIdTorneos.Count > 0)
                     {
                         notificacionesEquipo = await _db.Notificaciones.Include(i => i.Torneo)
-                                                                  .Include(i => i.Equipo)
-                                                                  .Where(w => listaIdTorneos.Contains(w.Torneo.Id))
-                                                                  .ToListAsync();
+                                                                       .Include(i => i.Equipo)
+                                                                       .Where(w => listaIdTorneos.Contains(w.Torneo.Id) || 
+                                                                                  (w.Equipo == null && w.General == false))
+                                                                       .ToListAsync();
                     }
 
                 }
@@ -86,7 +95,7 @@ namespace Negocio
                 notificaciones.AddRange(notificacionGeneral);
                 notificaciones.AddRange(notificacionesEquipo);
 
-                notificaciones = notificaciones.OrderByDescending(w => w.FechaHora).ToList();
+                notificaciones = notificaciones.OrderByDescending(w => w.FechaHora).DistinctBy(d => d.Id).ToList();
                 return notificaciones;
             }
             catch (Exception ex)
@@ -95,7 +104,28 @@ namespace Negocio
             }
         }
 
+        public async Task<List<Notificacion>> ObtenerSegunUsuarioOrganizador(UsuarioLogueado usuario)
+        {
+            try
+            {
+                List<Notificacion> notificaciones = new List<Notificacion>();
+                List<Notificacion> notificacionesFiltrados = new();
 
+                notificaciones = await _db.Notificaciones.Include(i => i.Torneo.Usuario)
+                                                                  .Include(i => i.Equipo)
+                                                                  .Where(w => w.Torneo.Usuario.Id == usuario.Id)
+                                                                  .ToListAsync();
+
+
+
+                notificacionesFiltrados = notificaciones.OrderBy(w => w.FechaHora).ToList();
+                return notificacionesFiltrados;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task<bool> BorrarNotificacionesTerminoPartido(int torneoId)
         {

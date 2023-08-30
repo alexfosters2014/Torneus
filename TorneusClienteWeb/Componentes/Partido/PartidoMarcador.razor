@@ -83,13 +83,13 @@
                 <div class="playPartido">
 
                      <a href="" @onclick="NotificarComienzoAEquipos" @onclick:preventDefault>
-                        <img src="/imagenes/enviarPartido.png" alt="" class="imgPlay">
+                        <img src="/imagenes/enviarPartido2.png" alt="" class="imgPlay">
                     </a>
 
                     <EspacioVertical Altura="3px" />
 
                     <a href="" @onclick="ComenzarPartido" @onclick:preventDefault>
-                        <img src="/imagenes/@ImagenPlay" alt="" class="imgPlay">
+                        <img src="/imagenes/play2.png" alt="" class="imgPlay">
 
                     </a>
                 </div>
@@ -123,8 +123,6 @@
     private int puntajeMaximoSegunSet = 0;
 
     private bool EsconderIconoPlay = true;
-
-    private string ImagenPlay = "play.png";
 
     private DateTime HorarioInicioPartido;
 
@@ -181,7 +179,6 @@
             {
                 Partido.EstadoPartido = Util.EstadoPartido.EN_PROCESO.ToString();
                 EsconderIconoPlay = true;
-                ImagenPlay = "pelota.png";
                 Partido.Inicio = DateTime.Now;
             }
             else

@@ -63,3 +63,33 @@
     border-radius: 10px !important;
     font-size: 0.8rem;
 }
+
+.fechahora {
+    background-color: black;
+    border-radius: 10px;
+    padding: 0 10px !important;
+}
+
+.outline-seleccion{
+    border: 1px solid grey;
+    border-radius:10px;
+    padding:3px;
+}
+
+.solid-seleccion {
+    border: 1px solid grey;
+    background-color: black;
+    color: snow;
+    border-radius: 10px;
+    padding: 3px;
+}
+
+.margen-izq-superpuesto {
+    margin-left: -40px;
+}
+
+.fixed-input-notificacion{
+    position: fixed;
+    bottom: 80px;
+    width: 96%;
+}

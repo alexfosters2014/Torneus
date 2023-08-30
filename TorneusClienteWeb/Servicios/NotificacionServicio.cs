@@ -17,7 +17,7 @@ namespace TorneusClienteWeb.Servicios
 
         private List<NotificacionDTO> Notificaciones = new();
 
-        private bool cargadasNotificaciones = false;
+        public event Action OnActualizarListadoNotificacionesEnviadasEvent;
 
         public NotificacionServicio(NotificacionServicioDatos notificacionServicioDatos, UsuarioServicio usuarioServicio, HubConnection hubConnection)
         {
@@ -48,6 +48,24 @@ namespace TorneusClienteWeb.Servicios
             }
         }
 
+        public async Task<bool> RegistrarNotificacion(NotificacionDTO notificacion)
+        {
+            try
+            {
+                NotificacionDTO notifRegistrado = await _notificacionServicioDatos.RegistrarNotificacion(notificacion);
+                await SetNotificacionOrganizador(notifRegistrado);
+
+                OnActualizarListadoNotificacionesEnviadasEvent?.Invoke();
+
+                await _hubConnection.SendAsync("EnviarNuevaNotificacion", notifRegistrado);
+                return notifRegistrado != null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
 
         public async Task<List<NotificacionDTO>> ObtenerNotificaciones()
         {
@@ -55,13 +73,36 @@ namespace TorneusClienteWeb.Servicios
             {
                 UsuarioLogueado usuario = _usuarioServicio.ObtenerUsuarioLogueado();
                 Notificaciones = await _notificacionServicioDatos.ObtenerListadoNotificaciones(usuario);
-                Notificaciones = Notificaciones.OrderByDescending(o => o.FechaHora).ToList();
                 return Notificaciones;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+
+        public async Task<List<NotificacionDTO>> ObtenerNotificacionesOrganizador()
+        {
+            try
+            {
+                if (Notificaciones.Count < 1)
+                {
+                    UsuarioLogueado usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+                    Notificaciones = await _notificacionServicioDatos.ObtenerListadoNotificacionesOrganizador(usuario);
+                }
+
+                return Notificaciones;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task SetNotificacionOrganizador(NotificacionDTO notificacion)
+        {
+                Notificaciones.Add(notificacion);
         }
 
 
