@@ -31,29 +31,38 @@ else
     protected async override Task OnInitializedAsync()
     {
 
-        await Actualizar();
-
         _hubConnection.On<NotificacionDTO>("RecibirNuevaNotificacion", async (notificacion) =>
        {
-           int usuarioId = _servicioUsuario.ObtenerUsuarioLogueado().Id;
-           if (!notificacion.General && notificacion.Equipo == null)
+           var usuarioLogueado = _servicioUsuario.ObtenerUsuarioLogueado();
+
+
+           if (notificacion.General)
            {
-               await Actualizar();
-               StateHasChanged();
+               Actualizar();
            }
-           else if (notificacion.General || notificacion.Equipo.UsuarioId == usuarioId)
+
+       if (notificacion.Equipo != null)
+       {
+           if (!notificacion.General && notificacion.Equipo.UsuarioId == usuarioLogueado.Id)
            {
-               await Actualizar();
-               StateHasChanged();
+               Actualizar();
+           }  
+       }
+
+           if (!notificacion.General && notificacion.Equipo == null && usuarioLogueado.Rol == Util.Roles.EQUIPO.ToString())
+           {
+               Actualizar();
            }
+
        });
 
+        Actualizar();
     }
 
-    private async Task Actualizar()
+    private async void Actualizar()
     {
-        Notificaciones = new List<NotificacionDTO>();
         Notificaciones = await _servicioNotificaciones.ObtenerNotificaciones();
+        StateHasChanged();
     }
 }
 

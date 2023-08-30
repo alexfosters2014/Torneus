@@ -84,10 +84,10 @@ namespace Negocio
                     if (listaIdTorneos.Count > 0)
                     {
                         notificacionesEquipo = await _db.Notificaciones.Include(i => i.Torneo)
-                                                                  .Include(i => i.Equipo)
-                                                                  .Where(w => listaIdTorneos.Contains(w.Torneo.Id) || 
-                                                                          (w.Equipo == null && w.General == false))
-                                                                  .ToListAsync();
+                                                                       .Include(i => i.Equipo)
+                                                                       .Where(w => listaIdTorneos.Contains(w.Torneo.Id) || 
+                                                                                  (w.Equipo == null && w.General == false))
+                                                                       .ToListAsync();
                     }
 
                 }
@@ -95,7 +95,7 @@ namespace Negocio
                 notificaciones.AddRange(notificacionGeneral);
                 notificaciones.AddRange(notificacionesEquipo);
 
-                notificaciones = notificaciones.OrderByDescending(w => w.FechaHora).ToList();
+                notificaciones = notificaciones.OrderByDescending(w => w.FechaHora).DistinctBy(d => d.Id).ToList();
                 return notificaciones;
             }
             catch (Exception ex)

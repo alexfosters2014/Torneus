@@ -52,11 +52,13 @@ namespace TorneusClienteWeb.Servicios
         {
             try
             {
-                NotificacionDTO registrado = await _notificacionServicioDatos.RegistrarNotificacion(notificacion);
+                NotificacionDTO notifRegistrado = await _notificacionServicioDatos.RegistrarNotificacion(notificacion);
+                await SetNotificacionOrganizador(notifRegistrado);
 
-                await _hubConnection.SendAsync("EnviarNuevaNotificacion", registrado);
                 OnActualizarListadoNotificacionesEnviadasEvent?.Invoke();
-                return registrado != null;
+
+                await _hubConnection.SendAsync("EnviarNuevaNotificacion", notifRegistrado);
+                return notifRegistrado != null;
             }
             catch (Exception ex)
             {
@@ -84,14 +86,23 @@ namespace TorneusClienteWeb.Servicios
         {
             try
             {
-                UsuarioLogueado usuario = _usuarioServicio.ObtenerUsuarioLogueado();
-                Notificaciones = await _notificacionServicioDatos.ObtenerListadoNotificacionesOrganizador(usuario);
+                if (Notificaciones.Count < 1)
+                {
+                    UsuarioLogueado usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+                    Notificaciones = await _notificacionServicioDatos.ObtenerListadoNotificacionesOrganizador(usuario);
+                }
+
                 return Notificaciones;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task SetNotificacionOrganizador(NotificacionDTO notificacion)
+        {
+                Notificaciones.Add(notificacion);
         }
 
 

@@ -57,7 +57,23 @@
 
         _hubConnection.On<NotificacionDTO>("RecibirNuevaNotificacion", async (notificacion) =>
         {
-            if (notificacion.General || notificacion.Equipo.UsuarioId == _usuarioServicio.ObtenerUsuarioLogueado().Id)
+            var usuarioLogueado = _usuarioServicio.ObtenerUsuarioLogueado();
+
+
+            if (notificacion.General)
+            {
+                _servicioMenu.NuevaNotificacionIcono();
+            }
+
+            if (notificacion.Equipo != null)
+            {
+                if (!notificacion.General && notificacion.Equipo.UsuarioId == usuarioLogueado.Id)
+                {
+                    _servicioMenu.NuevaNotificacionIcono();
+                }
+            }
+
+            if (!notificacion.General && notificacion.Equipo == null && usuarioLogueado.Rol == Util.Roles.EQUIPO.ToString())
             {
                 _servicioMenu.NuevaNotificacionIcono();
             }
