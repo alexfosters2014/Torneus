@@ -1,4 +1,5 @@
 ﻿
+using DTOs_Compartidos.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace WebApiTorneus.Services
@@ -6,21 +7,29 @@ namespace WebApiTorneus.Services
     public static class DecodificadorJWT
     {
 
-        public static string ObenterClaimEmail(string tokenString)
+        public static LoginGoogleDTO ObtenerDatosUsuarioGoogle(string tokenString)
         {
-            string email = "";
+            try
+            {
+                LoginGoogleDTO usuarioGogole = new();
 
-            // Configura la validación del token JWT (depende de tus requisitos).
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.ReadJwtToken(tokenString);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var token = tokenHandler.ReadJwtToken(tokenString);
 
-            // Accede a los claims del token.
-            var claims = token.Claims;
+                // Accede a los claims del token.
+                var claims = token.Claims;
 
-            // Puedes acceder a claims específicos por nombre.
-            var userId = claims.FirstOrDefault(c => c.Type == "sub")?.Value; // Cambia "sub" al nombre del claim que necesitas.
+                usuarioGogole.Pass = claims.FirstOrDefault(c => c.Type == "sub")?.Value;
+                usuarioGogole.Email = claims.FirstOrDefault(c => c.Type == "email")?.Value;
+                usuarioGogole.Nombre = claims.FirstOrDefault(c => c.Type == "name")?.Value;
 
-            return email;
+                return usuarioGogole;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("El usuario de google no existe");
+            }
+           
         }
        
 
