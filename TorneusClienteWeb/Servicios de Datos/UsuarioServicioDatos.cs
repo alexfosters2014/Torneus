@@ -1,4 +1,5 @@
-﻿using Negocio.DTOs;
+﻿using DTOs_Compartidos.DTOs;
+using Negocio.DTOs;
 using Negocio.Models;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
@@ -40,6 +41,33 @@ namespace TorneusClienteWeb.Servicios_de_Datos
            
         }
 
+        public async Task<string> LoginUsuarioGoogle(LoginGoogleDTO login)
+        {
+            try
+            {
+                if (login == null) throw new Exception("No existe el modelo");
+
+                var response = await _httpClient.PostAsJsonAsync("api/Usuario/LoginGoogle", login);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var token = JsonConvert.DeserializeObject<TokenModel>(content);
+                    return token.Token;
+                }
+                else
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    throw new Exception(content);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
 
         public async Task<string> RegistroUsuario(RegistroDTO registroDTO)
         {
@@ -48,6 +76,33 @@ namespace TorneusClienteWeb.Servicios_de_Datos
                 if (registroDTO == null) throw new Exception("No existe el modelo");
 
                 var response = await _httpClient.PostAsJsonAsync("api/Usuario/Registro", registroDTO);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var token = JsonConvert.DeserializeObject<TokenModel>(content);
+                    return token.Token;
+                }
+                else
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    throw new Exception(content);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
+        public async Task<string> RegistroUsuarioGoogle(RegistroGoogleDTO registroDTO)
+        {
+            try
+            {
+                if (registroDTO == null) throw new Exception("No existe el modelo");
+
+                var response = await _httpClient.PostAsJsonAsync("api/Usuario/RegistroGoogle", registroDTO);
 
                 if (response.IsSuccessStatusCode)
                 {

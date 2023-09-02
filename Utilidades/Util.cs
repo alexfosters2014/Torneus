@@ -6,6 +6,7 @@ namespace Utilidades
     {
 
         public static string TOKEN_LOCAL = "LoginTorneoStorageToken102023";
+        public static string TOKEN_GOOGLE = "LoginTorneoStorageTokenGoogle";
         public static string URL_BASE_IMAGENES = "https://imagenescontenedor.blob.core.windows.net/torneusimagenes";
         public static string URL_BASE_CONFIG_IMAGENES = "UrlBaseParaImagenes";
         public static string REGISTRARSE_GOOGLE = "REGISTRARSE_GOOGLE";
@@ -141,7 +142,23 @@ namespace Utilidades
             FINALIZADO
         }
 
+        public static string ExtraerTokenURL(string uri)
+        {
+            string token = string.Empty;
 
+            string[] partes = uri.Split("&");
+
+            if (partes.Length == 0) return token;
+
+            string? buscarIdToken = partes.SingleOrDefault(s => s.Contains("id_token"));
+
+            if (!string.IsNullOrEmpty(buscarIdToken))
+            {
+                token = buscarIdToken.Split("=")[1];
+            }
+
+            return token;
+        }
 
 
 

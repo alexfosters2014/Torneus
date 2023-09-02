@@ -67,6 +67,10 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddFileReaderService(options => options.UseWasmSharedBuffer = true);
 
+builder.Services.AddOidcAuthentication(opciones =>
+{
+    builder.Configuration.Bind("GoogleAutentificacionLocal", opciones.ProviderOptions);
+});
 
 builder.Services.AddScoped<ServicioMenu>();
 

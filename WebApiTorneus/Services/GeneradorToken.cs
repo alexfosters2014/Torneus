@@ -26,7 +26,7 @@ namespace WebApiTorneus.Services
                 _config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
-                expires: DateTime.Now.AddYears(3),
+                expires: DateTime.Now.AddYears(10),
                 signingCredentials: credenciales);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

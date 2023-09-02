@@ -44,20 +44,13 @@ namespace Negocio
             }
         }
 
-        public async Task<Usuario> LoginGoogleUsuario(LoginGoogleDTO loginGogole, string claveSecretaValidar)
+        public async Task<Usuario> LoginUsuarioGoogle(LoginDTO login)
         {
             try
             {
-                if (loginGogole == null || string.IsNullOrEmpty(loginGogole.Mail) || string.IsNullOrEmpty(loginGogole.ClaveSecreta))
-                {
-                    throw new Exception("Hay campos sin completar");
-                }
-
-                if (claveSecretaValidar != loginGogole.ClaveSecreta) throw new Exception("No se ha podido validar tu cuenta Google");
-
-                var usuarioBuscado = await _db.Usuarios.SingleOrDefaultAsync(us => us.Mail == loginGogole.Mail && us.Token == loginGogole.IdUsuarioGoogle);
-
-                if (usuarioBuscado == null) throw new Exception(Util.REGISTRARSE_GOOGLE);
+                var usuarioBuscado = await _db.Usuarios.SingleOrDefaultAsync(us => us.Mail == login.Mail);
+                if (usuarioBuscado == null) throw new Exception("REGISTRAR");
+                if (usuarioBuscado.Pass != login.Pass) throw new Exception("No existe el usuario o la contraseña es incorrecta");
 
                 return usuarioBuscado;
             }
@@ -66,6 +59,29 @@ namespace Negocio
                 throw new Exception(ex.Message);
             }
         }
+
+        //public async Task<Usuario> LoginGoogleUsuario(LoginGoogleDTO loginGogole, string claveSecretaValidar)
+        //{
+        //    try
+        //    {
+        //        //if (loginGogole == null || string.IsNullOrEmpty(loginGogole.Mail) || string.IsNullOrEmpty(loginGogole.ClaveSecreta))
+        //        //{
+        //        //    throw new Exception("Hay campos sin completar");
+        //        //}
+
+        //        //if (claveSecretaValidar != loginGogole.ClaveSecreta) throw new Exception("No se ha podido validar tu cuenta Google");
+
+        //        //var usuarioBuscado = await _db.Usuarios.SingleOrDefaultAsync(us => us.Mail == loginGogole.Mail && us.Token == loginGogole.IdUsuarioGoogle);
+
+        //        //if (usuarioBuscado == null) throw new Exception(Util.REGISTRARSE_GOOGLE);
+
+        //        return null;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<Usuario> RegistroUsuario(Usuario registro)
         {
@@ -113,26 +129,26 @@ namespace Negocio
         }
 
 
-        public async Task<Usuario> LoginUsuarioEspectador()
-        {
-            try
-            {
-                Usuario usuarioLogueado = new()
-                {
-                    Id = 0,
-                    Mail = Guid.NewGuid().ToString(),
-                    Rol = "ESPECTADOR",
-                    Token = ""
-                };
+        //public async Task<Usuario> LoginUsuarioEspectador()
+        //{
+        //    try
+        //    {
+        //        Usuario usuarioLogueado = new()
+        //        {
+        //            Id = 0,
+        //            Mail = Guid.NewGuid().ToString(),
+        //            Rol = "ESPECTADOR",
+        //            Token = ""
+        //        };
 
 
-                return usuarioLogueado;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
-        }
+        //        return usuarioLogueado;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.Message);
+        //    }
+        //}
 
         public async Task<bool> HabilitadoVendedorMercadoPago(int usuarioId)
         {

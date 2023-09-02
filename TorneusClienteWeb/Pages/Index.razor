@@ -7,6 +7,7 @@
 @using System.IdentityModel.Tokens.Jwt
 @using System.Text
 @inject ISnackbar _snackbar
+@inject IJSRuntime _js
 
 
 
@@ -18,8 +19,8 @@
             <img src="/imagenes/logoTorneus.png" alt="" class="logo-login" />
         </div>
        
-        
-        <Boton BackGroungColor="#e0e0e0" ButtonText="Voy a iniciar con Google" ImageUrl="/imagenes/google.png" />
+
+        <Boton BackGroungColor="#e0e0e0" ButtonText="Voy a iniciar con Google" ImageUrl="/imagenes/google.png" OnClick="AutentificarmeConGoogle"/>
 
         <EditForm Model="@UsuarioLogin" OnValidSubmit="Loguearme">
                     <DataAnnotationsValidator/>
@@ -70,7 +71,9 @@
 
 
 @code{
-    public LoginDTO UsuarioLogin { get; set; } = new();
+    private string IdToken { get; set; }
+
+    public LoginDTO UsuarioLogin { get; set; } = new(); 
     private bool cargado = false;
 
     bool isShow;
@@ -80,6 +83,14 @@
 
     protected async override Task OnInitializedAsync()
     {
+        IdToken = Util.ExtraerTokenURL(_nav.Uri);
+        if (!string.IsNullOrEmpty(IdToken))
+        {
+            await _localStorage.SetItemAsync(Utilidades.Util.TOKEN_GOOGLE, IdToken);
+            LoguearmeConGoogle();
+            return;
+        }
+
         UsuarioLogueado usuario = await _localStorage.GetItemAsync<UsuarioLogueado>(Util.TOKEN_LOCAL);
         if (usuario != null)
         {
@@ -87,6 +98,8 @@
             Navegar(usuario.Rol);
         }
     }
+
+
     public async void Loguearme()
     {
         try
@@ -101,13 +114,35 @@
         }
         catch (Exception ex)
         {
-             cargado = false;
+            cargado = false;
             _snackbar.Add(ex.Message, Severity.Warning);
             StateHasChanged();
         }
-        
+    }
 
+    public async void LoguearmeConGoogle()
+    {
+        try
 
+        {
+            cargado = true;
+            bool respuesta = await _usuarioServicio.LoguearmeConGoogle(IdToken);
+            var usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+            await _localStorage.SetItemAsync(Utilidades.Util.TOKEN_LOCAL, usuario);
+            _snackbar.Add("Sesión iniciada", Severity.Success);
+            Navegar(usuario.Rol);
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message == "REGISTRAR")
+            {
+                RegistrarConGoogle();
+            }
+            else
+            {
+                _snackbar.Add(ex.Message, Severity.Error);
+            }
+        }
     }
 
     void ButtonTestclick()
@@ -136,12 +171,29 @@
         {
             _nav.NavigateTo($"/{rol}/Principal");
         }
-       
+
     }
 
     private void Registrar()
     {
         _nav.NavigateTo("/Registro");
+    }
+
+    private void RegistrarConGoogle()
+    {
+        _nav.NavigateTo("/RegistroConGoogle");
+    }
+
+    private void AutentificarmeConGoogle()
+    {
+        var url ="https://accounts.google.com/o/oauth2/v2/auth?";
+        url += "client_id=446867793846-0rp377qf18vd0ineseiftohhb7mi0852.apps.googleusercontent.com";
+        url += "&redirect_uri=https://localhost:7101";
+        url += "&response_type=id_token";
+        url += "&scope=openid%20profile%20email&nonce=RANDOM_NONCE&state=RANDOM_STATE";
+
+        _nav.NavigateTo(url);
+
     }
 
 

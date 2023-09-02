@@ -81,10 +81,14 @@ namespace WebApiTorneus.Controllers
         {
             try
             {
-                loginGoogleDTO.Mail.ToLower().Trim();
-                var claveSecreta = _config["ClaveSecretaGoogle"];
+                LoginGoogleDTO usuarioGoogleDecodificado = DecodificadorJWT.ObtenerDatosUsuarioGoogle(loginGoogleDTO.TokenGoogle);
 
-                Usuario login = await _usuarioService.LoginGoogleUsuario(loginGoogleDTO, claveSecreta);
+                LoginDTO loginDTO = new();
+
+                loginDTO.Mail = usuarioGoogleDecodificado.Email.ToLower().Trim();
+                loginDTO.Pass = usuarioGoogleDecodificado.Pass.Trim();
+
+                Usuario login = await _usuarioService.LoginUsuarioGoogle(loginDTO);
                 var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
 
                 var secretkey = _config["Jwt:SecretKey"];
@@ -122,7 +126,6 @@ namespace WebApiTorneus.Controllers
             {
                 var usuario = _mapper.Map<RegistroDTO, Usuario>(registroDTO);
                 usuario.Mail.ToLower().Trim();
-                usuario.Token = registroDTO.IdUsuarioGoogle;
 
                 Usuario registro = await _usuarioService.RegistroUsuario(usuario);
                 var registradoRealizado = _mapper.Map<UsuarioLogueado>(registro);
@@ -148,41 +151,92 @@ namespace WebApiTorneus.Controllers
             }
         }
 
-
-
         /// <summary>
-        /// Permite el login de un usuario con rol Espectador
+        /// Permite el registro de un usuario para rol ORGANIZADOR o EQUIPO
         /// </summary>
         /// <remarks>
-        /// Este endpoint devuelve token de tipo JWT con el usuario logueado
+        /// Este endpoint devuelve token de tipo JWT con el usuario registrado
         /// { Id = int, Mail = string, Rol = "ESPECTADOR" o "EQUIPO" o "ESPECTADOR" o "PLANILLERO", Token = string }
         /// </remarks>
         /// <response code="200">OK. El usuario se encontró correctamente. Se devuelve un token JWT</response>
-        /// <response code="400">Validaciones varias erroneas</response>
+        /// <response code="400">No encontrado</response>
+        /// <response code="409">El usuario con el ID especificado ya existe.</response>
         [ProducesResponseType(typeof(TokenModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [HttpGet("LoginEspectador")]
-        public async Task<IActionResult> GetLoginEspectador()
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [HttpPost("RegistroGoogle")]
+        public async Task<IActionResult> PostRegistroGoogle([FromBody] RegistroGoogleDTO registroGoogleDTO)
         {
             try
             {
-                Usuario login = await _usuarioService.LoginUsuarioEspectador();
-                var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
+                Usuario usuario = new();
+                usuario.Rol = registroGoogleDTO.Rol;
 
-                var secretkey = _config["Jwt:SecretKey"];
+                LoginGoogleDTO usuarioGoogleDecodificado = DecodificadorJWT.ObtenerDatosUsuarioGoogle(registroGoogleDTO.TokenGoogle);
+
+                usuario.Mail = usuarioGoogleDecodificado.Email.ToLower().Trim();
+                usuario.Pass = usuarioGoogleDecodificado.Pass;
+                usuario.Nombre = usuarioGoogleDecodificado.Nombre;
+                usuario.Tel = "0";
+
+                Usuario registro = await _usuarioService.RegistroUsuario(usuario);
+                var registradoRealizado = _mapper.Map<UsuarioLogueado>(registro);
 
                 var token = new TokenModel()
                 {
-                    Token = GeneradorToken.CrearToken(usuarioLogueado, _config)
+                    Token = GeneradorToken.CrearToken(registradoRealizado, _config)
                 };
 
                 return Ok(token);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                if (ex.Message == "DUPLICADO")
+                {
+                    return Conflict("El usuario ya existe");
+                }
+                else
+                {
+                    return BadRequest(ex.Message);
+
+                }
             }
         }
+
+
+        ///// <summary>
+        ///// Permite el login de un usuario con rol Espectador
+        ///// </summary>
+        ///// <remarks>
+        ///// Este endpoint devuelve token de tipo JWT con el usuario logueado
+        ///// { Id = int, Mail = string, Rol = "ESPECTADOR" o "EQUIPO" o "ESPECTADOR" o "PLANILLERO", Token = string }
+        ///// </remarks>
+        ///// <response code="200">OK. El usuario se encontró correctamente. Se devuelve un token JWT</response>
+        ///// <response code="400">Validaciones varias erroneas</response>
+        //[ProducesResponseType(typeof(TokenModel), StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[HttpGet("LoginEspectador")]
+        //public async Task<IActionResult> GetLoginEspectador()
+        //{
+        //    try
+        //    {
+        //        Usuario login = await _usuarioService.LoginUsuarioEspectador();
+        //        var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
+
+        //        var secretkey = _config["Jwt:SecretKey"];
+
+        //        var token = new TokenModel() 
+        //        {
+        //            Token = GeneradorToken.CrearToken(usuarioLogueado, _config)
+        //        };
+
+        //        return Ok(token);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
 
 
 
