@@ -81,20 +81,22 @@ namespace WebApiTorneus.Controllers
         {
             try
             {
-                loginGoogleDTO.Mail.ToLower().Trim();
-                var claveSecreta = _config["ClaveSecretaGoogle"];
+                //loginGoogleDTO.Mail.ToLower().Trim();
+                //var claveSecreta = _config["ClaveSecretaGoogle"];
 
-                Usuario login = await _usuarioService.LoginGoogleUsuario(loginGoogleDTO, claveSecreta);
-                var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
+                //Usuario login = await _usuarioService.LoginGoogleUsuario(loginGoogleDTO, claveSecreta);
+                //var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
 
-                var secretkey = _config["Jwt:SecretKey"];
+                //var secretkey = _config["Jwt:SecretKey"];
 
-                var token = new TokenModel()
-                {
-                    Token = GeneradorToken.CrearToken(usuarioLogueado, _config)
-                };
+                //var token = new TokenModel()
+                //{
+                //    Token = GeneradorToken.CrearToken(usuarioLogueado, _config)
+                //};
+                string email = DecodificadorJWT.ObenterClaimEmail(loginGoogleDTO.TokenGoogle);
 
-                return Ok(token);
+
+                return Ok(email);
             }
             catch (Exception ex)
             {

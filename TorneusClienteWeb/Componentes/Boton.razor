@@ -1,6 +1,6 @@
 ﻿
 
-<button class="image-button" style="background-color: @BackGroungColor">
+<button class="image-button" style="background-color: @BackGroungColor" @onclick="OnClickEvento">
     <img src="@ImageUrl" alt="Icono" class="icono-boton" />
     <span class="text-boton">@ButtonText</span>
 </button>
@@ -16,4 +16,11 @@
 
     [Parameter]
     public string BackGroungColor { get; set; }
+
+    [Parameter] public EventCallback<EventArgs> OnClick { get; set; }
+
+    private async Task OnClickEvento()
+    {
+        await OnClick.InvokeAsync(EventArgs.Empty);
+    }
 }

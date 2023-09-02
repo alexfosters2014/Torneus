@@ -141,7 +141,23 @@ namespace Utilidades
             FINALIZADO
         }
 
+        public static string ExtraerTokenURL(string uri)
+        {
+            string token = string.Empty;
 
+            string[] partes = uri.Split("&");
+
+            if (partes.Length == 0) return token;
+
+            string? buscarIdToken = partes.SingleOrDefault(s => s.Contains("id_token"));
+
+            if (!string.IsNullOrEmpty(buscarIdToken))
+            {
+                token = buscarIdToken.Split("=")[1];
+            }
+
+            return token;
+        }
 
 
 
