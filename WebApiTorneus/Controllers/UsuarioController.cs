@@ -204,42 +204,6 @@ namespace WebApiTorneus.Controllers
         }
 
 
-        ///// <summary>
-        ///// Permite el login de un usuario con rol Espectador
-        ///// </summary>
-        ///// <remarks>
-        ///// Este endpoint devuelve token de tipo JWT con el usuario logueado
-        ///// { Id = int, Mail = string, Rol = "ESPECTADOR" o "EQUIPO" o "ESPECTADOR" o "PLANILLERO", Token = string }
-        ///// </remarks>
-        ///// <response code="200">OK. El usuario se encontró correctamente. Se devuelve un token JWT</response>
-        ///// <response code="400">Validaciones varias erroneas</response>
-        //[ProducesResponseType(typeof(TokenModel), StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[HttpGet("LoginEspectador")]
-        //public async Task<IActionResult> GetLoginEspectador()
-        //{
-        //    try
-        //    {
-        //        Usuario login = await _usuarioService.LoginUsuarioEspectador();
-        //        var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
-
-        //        var secretkey = _config["Jwt:SecretKey"];
-
-        //        var token = new TokenModel() 
-        //        {
-        //            Token = GeneradorToken.CrearToken(usuarioLogueado, _config)
-        //        };
-
-        //        return Ok(token);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(ex.Message);
-        //    }
-        //}
-
-
-
         /// <summary>
         /// Consulta si el vendedor está registrado en el marketplace de mercadopago
         /// </summary>
