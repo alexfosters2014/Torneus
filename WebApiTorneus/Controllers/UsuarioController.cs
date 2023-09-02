@@ -88,7 +88,7 @@ namespace WebApiTorneus.Controllers
                 loginDTO.Mail = usuarioGoogleDecodificado.Email.ToLower().Trim();
                 loginDTO.Pass = usuarioGoogleDecodificado.Pass.Trim();
 
-                Usuario login = await _usuarioService.LoginUsuario(loginDTO);
+                Usuario login = await _usuarioService.LoginUsuarioGoogle(loginDTO);
                 var usuarioLogueado = _mapper.Map<UsuarioLogueado>(login);
 
                 var secretkey = _config["Jwt:SecretKey"];
@@ -165,17 +165,19 @@ namespace WebApiTorneus.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [HttpPost("RegistroGoogle")]
-        public async Task<IActionResult> PostRegistroGoogle([FromBody] RegistroDTO registroDTO)
+        public async Task<IActionResult> PostRegistroGoogle([FromBody] RegistroGoogleDTO registroGoogleDTO)
         {
             try
             {
-                var usuario = _mapper.Map<RegistroDTO, Usuario>(registroDTO);
+                Usuario usuario = new();
+                usuario.Rol = registroGoogleDTO.Rol;
 
-                LoginGoogleDTO usuarioGoogleDecodificado = DecodificadorJWT.ObtenerDatosUsuarioGoogle(registroDTO.TokenGoogle);
+                LoginGoogleDTO usuarioGoogleDecodificado = DecodificadorJWT.ObtenerDatosUsuarioGoogle(registroGoogleDTO.TokenGoogle);
 
                 usuario.Mail = usuarioGoogleDecodificado.Email.ToLower().Trim();
                 usuario.Pass = usuarioGoogleDecodificado.Pass;
                 usuario.Nombre = usuarioGoogleDecodificado.Nombre;
+                usuario.Tel = "0";
 
                 Usuario registro = await _usuarioService.RegistroUsuario(usuario);
                 var registradoRealizado = _mapper.Map<UsuarioLogueado>(registro);

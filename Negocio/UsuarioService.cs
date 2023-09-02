@@ -44,6 +44,22 @@ namespace Negocio
             }
         }
 
+        public async Task<Usuario> LoginUsuarioGoogle(LoginDTO login)
+        {
+            try
+            {
+                var usuarioBuscado = await _db.Usuarios.SingleOrDefaultAsync(us => us.Mail == login.Mail);
+                if (usuarioBuscado == null) throw new Exception("REGISTRAR");
+                if (usuarioBuscado.Pass != login.Pass) throw new Exception("No existe el usuario o la contraseña es incorrecta");
+
+                return usuarioBuscado;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         //public async Task<Usuario> LoginGoogleUsuario(LoginGoogleDTO loginGogole, string claveSecretaValidar)
         //{
         //    try

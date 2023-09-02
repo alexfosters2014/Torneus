@@ -1,0 +1,103 @@
+﻿@page "/RegistroConGoogle"
+@inject ServicioMenu _servicioMenu
+@layout LayoutVacio
+@inject NavigationManager _nav
+@inject ILocalStorageService _localStorage
+@inject UsuarioServicio _usuarioServicio
+@using System.IdentityModel.Tokens.Jwt
+@using System.Text
+@inject ISnackbar _snackbar
+
+
+<div class="background-image">
+
+    <div class="card-registro">
+        <div class="center-container">
+            <img src="/imagenes/logoTorneus.png" alt="" class="logo-login" />
+        </div>
+       
+        <EspacioVertical Altura="20px" /> 
+        @if (!string.IsNullOrEmpty(NombreogueadoGoogle))
+        {
+            <p>@NombreogueadoGoogle elige tu rol de usuario</p>
+        }
+       
+        <EspacioVertical Altura="10px" />
+
+            @foreach (var rol in Util.RolesDiccionario)
+            {
+            <Boton ButtonText="@($"Soy {rol.Key}")" ImageUrl="@rutaIconosSelect(rol.Key)" OnClick="() => Registrar(rol.Key)" BackGroungColor="#ae90de" />
+           
+            }
+
+
+            <EspacioVertical Altura="15px" />
+            <div class="center-container-login">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Atras">Volver</MudButton>
+            </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    public RegistroGoogleDTO registroDTO { get; set; } = new();
+
+    private string TokenGoogle = "";
+    private string NombreogueadoGoogle = "";
+
+    protected async override Task OnInitializedAsync()
+    {
+        TokenGoogle = await _localStorage.GetItemAsync<string>(Util.TOKEN_GOOGLE);
+        NombreogueadoGoogle = DatosJWT.ObtenerNombreUsuarioGoogle(TokenGoogle);
+    }
+
+    public async Task Registrar(string rol)
+    {
+        try
+        {
+            registroDTO.Rol = rol;
+            registroDTO.TokenGoogle = TokenGoogle;
+
+            await _usuarioServicio.RegistrarmeConGoogle(registroDTO);
+            _snackbar.Add("Registrado con éxito", Severity.Success);
+            var usuario = _usuarioServicio.ObtenerUsuarioLogueado();
+            await _localStorage.SetItemAsync(Utilidades.Util.TOKEN_LOCAL, usuario);
+
+            await _localStorage.RemoveItemAsync(Util.TOKEN_GOOGLE);
+
+            Navegar(usuario.Rol);
+        }
+        catch (Exception ex)
+        {
+            _snackbar.Add(ex.Message, Severity.Warning);
+            StateHasChanged();
+        }
+    }
+
+    private string rutaIconosSelect(string rol)
+    {
+        return $"/imagenes/{rol}.png";
+    }
+
+    private void Navegar(string rol)
+    {
+        if (rol == Util.Roles.ESPECTADOR.ToString() || rol == Util.Roles.PLANILLERO.ToString())
+        {
+            _nav.NavigateTo("/GENERAL/Principal");
+        }
+        else
+        {
+            _nav.NavigateTo($"/{rol}/Principal");
+        }
+    }
+
+    private void Atras()
+    {
+        _nav.NavigateTo($"/");
+    }
+
+
+
+}
