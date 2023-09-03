@@ -79,17 +79,21 @@ namespace WebApiTorneus.Controllers
             {
                 List<PartidoDTO> partidos = new();
 
-                partidos = _fixtureTiempoReal.ObtenerFixtureTorneo(torneoId);
-
-                if (partidos.Count == 0)
+                bool torneoCerrado = await _torneoService.TorneoEstaCerrado(torneoId);
+                if (torneoCerrado)
                 {
                     partidos = _mapper.Map<List<Partido>, List<PartidoDTO>>(await _fixtureService.ObtenerPartidosTorneo(torneoId));
-                    bool torneoCerrado = await _torneoService.TorneoEstaCerrado(torneoId);
-                    if (!torneoCerrado)
+                }
+                else {
+                    partidos = _fixtureTiempoReal.ObtenerFixtureTorneo(torneoId);
+
+                    if (partidos.Count == 0)
                     {
+                        partidos = _mapper.Map<List<Partido>, List<PartidoDTO>>(await _fixtureService.ObtenerPartidosTorneo(torneoId));
                         await _fixtureTiempoReal.CargarFixture(partidos);
                     }
                 }
+              
 
                 if (partidos == null) return BadRequest("No se pudo obtener el fixture. Cod 159");
 
@@ -120,9 +124,18 @@ namespace WebApiTorneus.Controllers
             {
                 if (partidoDTO == null) throw new Exception("No hay partido a actualizar. W203");
 
+                int torneoId = partidoDTO.TorneoId;
                 Partido partido = _mapper.Map<PartidoDTO, Partido>(partidoDTO);
 
                 bool partidoActualizado = await _fixtureService.ActualizarPartido(partido);
+
+
+                bool partidosFinalizados = await _fixtureService.PartidosTodosFinalizados(partidoDTO.TorneoId);
+                if (partidosFinalizados)
+                {
+                    await _torneoService.FinalizarTorneo(torneoId);
+                    await _fixtureTiempoReal.BorrarFixtureTiempoReal(torneoId);
+                }
 
                 return Ok(partidoActualizado);
             }

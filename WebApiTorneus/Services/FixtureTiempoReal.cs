@@ -31,7 +31,7 @@ namespace WebApiTorneus.Services
             fixturesTorneos.AddRange(partidos);
         }
 
-        public async Task BorrarFixtureTiempoReak(int torneoId)
+        public async Task BorrarFixtureTiempoReal(int torneoId)
         {
             fixturesTorneos.RemoveAll(r => r.Torneo.Id == torneoId);
         }

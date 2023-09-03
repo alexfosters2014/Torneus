@@ -195,7 +195,7 @@
 
     private async Task AumentarMarcador(string tipoEquipo)
     {
-        if (UsuarioAutorizadoMarcador)
+            if (UsuarioAutorizadoMarcador)
         {
             if (tipoEquipo == "LOCAL")
             {
@@ -287,7 +287,18 @@
         {
             _snackBar.Add("Partido finalizado y actualizado", Severity.Success);
         }
-
+        if (partidos.Count > 0)
+        {
+            bool partidosActualizados = true;
+            foreach (var partido in partidos)
+            {
+                partidosActualizados &= await _servicioFixture.ActualizarPartidoTorneo(partido);
+            }
+            if (!partidosActualizados)
+            {
+                _snackBar.Add("Alguno de los partidos no puedo ser actualizado", Severity.Success);
+            }
+        }
         await ActualizarPartidosTermino(partidos);
     }
 
