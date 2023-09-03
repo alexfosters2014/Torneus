@@ -14,10 +14,12 @@ namespace Negocio
     {
 
         private readonly TorneoContext _db;
+        private readonly EquipoService _equipoService;
 
-        public FixtureService(TorneoContext db)
+        public FixtureService(TorneoContext db, EquipoService equipoService)
         {
             _db = db;
+            _equipoService = equipoService;
         }
 
 
@@ -92,9 +94,13 @@ namespace Negocio
             try
             {
                 var partidoBuscado = await _db.Partidos.SingleOrDefaultAsync(s => s.Id == partido.Id);
-                
-                partidoBuscado.EquipoLocal = partido.EquipoLocal;
-                partidoBuscado.EquipoVisitante = partido.EquipoVisitante;
+
+                var equipoLocalBuscado = await _equipoService.ObtenerEquipoSegunId(partido.EquipoLocal.Id);
+                var equipoVisitanteBuscado = await _equipoService.ObtenerEquipoSegunId(partido.EquipoVisitante.Id);
+
+
+                partidoBuscado.EquipoLocal = equipoLocalBuscado;
+                partidoBuscado.EquipoVisitante = equipoVisitanteBuscado;
                 partidoBuscado.Fecha = partido.Fecha;
                 partidoBuscado.MarcadorLocal = partido.MarcadorLocal;
                 partidoBuscado.MarcadorVisitante = partido.MarcadorVisitante;
@@ -114,8 +120,26 @@ namespace Negocio
                 partidoBuscado.PartidoSigPerdedor = partido.PartidoSigPerdedor;
                 partidoBuscado.Grupo = partido.Grupo;
 
-                _db.Entry(partidoBuscado.EquipoLocal).State = EntityState.Unchanged;
-                _db.Entry(partidoBuscado.EquipoVisitante).State = EntityState.Unchanged;
+
+                if (partidoBuscado.EquipoLocal !=null)
+                {
+                    _db.Entry(partidoBuscado.EquipoLocal).State = EntityState.Unchanged;
+                }
+                else
+                {
+                    partido.EquipoLocal = null;
+                    partido.EquipoLocalId = null;
+                }
+
+                if (partidoBuscado.EquipoVisitante != null)
+                {
+                    _db.Entry(partidoBuscado.EquipoVisitante).State = EntityState.Unchanged;
+                }
+                else
+                {
+                    partido.EquipoVisitante = null;
+                    partido.EquipoVisitanteId = null;
+                }
 
                 int resultado = await _db.SaveChangesAsync();
 

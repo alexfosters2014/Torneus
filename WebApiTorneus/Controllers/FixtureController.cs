@@ -124,6 +124,7 @@ namespace WebApiTorneus.Controllers
             {
                 if (partidoDTO == null) throw new Exception("No hay partido a actualizar. W203");
 
+                int torneoId = partidoDTO.TorneoId;
                 Partido partido = _mapper.Map<PartidoDTO, Partido>(partidoDTO);
 
                 bool partidoActualizado = await _fixtureService.ActualizarPartido(partido);
@@ -132,7 +133,8 @@ namespace WebApiTorneus.Controllers
                 bool partidosFinalizados = await _fixtureService.PartidosTodosFinalizados(partidoDTO.TorneoId);
                 if (partidosFinalizados)
                 {
-                    await _torneoService.FinalizarTorneo(partidoDTO.TorneoId);
+                    await _torneoService.FinalizarTorneo(torneoId);
+                    await _fixtureTiempoReal.BorrarFixtureTiempoReal(torneoId);
                 }
 
                 return Ok(partidoActualizado);

@@ -123,7 +123,10 @@ namespace Negocio
         }
 
 
-
+        public async Task<Equipo> ObtenerEquipoSegunId(int equipoId)
+        {
+            return await _db.Equipos.SingleOrDefaultAsync(s => s.Id == equipoId);
+        }
 
 
     }
