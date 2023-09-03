@@ -36,6 +36,12 @@
             var nuevaNotificacoin = (NotificacionDTO)result.Data;
             nuevaNotificacoin.Mensaje = mensaje;
 
+            if (string.IsNullOrEmpty(nuevaNotificacoin.Mensaje))
+            {
+                _snackBar.Add("No puede enviar un mensaje vacío", Severity.Warning);
+                return;
+            }
+
             bool registradoYNotificado = await _servicioNotificacion.RegistrarNotificacion(nuevaNotificacoin);
 
             if (registradoYNotificado)
