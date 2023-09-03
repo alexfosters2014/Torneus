@@ -277,6 +277,22 @@ namespace Negocio
             return torneo.Cerrrado;
         }
 
+        public async Task<bool> FinalizarTorneo(int torneoId)
+        {
+            var torneo = await _db.Torneos.SingleOrDefaultAsync(w => w.Id == torneoId);
+            if (torneo != null)
+            {
+                torneo.Cerrrado = true;
+                await _db.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+          
+        }
+
 
 
 

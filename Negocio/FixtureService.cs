@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilidades;
 
 namespace Negocio
 {
@@ -128,7 +129,19 @@ namespace Negocio
         }
 
 
+        public async Task<bool> PartidosTodosFinalizados(int torneoId)
+        {
+            try
+            {
+                bool partidos = await _db.Partidos.Where(w => w.Torneo.Id == torneoId).AnyAsync(a => a.EstadoPartido != Util.EstadoPartido.FINALIZADO.ToString());
 
+                return !partidos;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
 
 
