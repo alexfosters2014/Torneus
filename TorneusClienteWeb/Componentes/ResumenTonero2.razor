@@ -1,0 +1,53 @@
+﻿
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Cantidad de equipos que participaron</p>
+        <p>7</p>
+    </div>
+</section>
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Cantidad partidos jugados</p>
+        <p>7</p>
+    </div>
+</section>
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Tiempos Promedio por partido </p>
+        <p>10 min</p>
+    </div>
+</section>
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Ganador: Tal equipo</p>
+        <p>Segundo puesto: Tal equipo</p>
+    </div>
+</section>
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Puntaje totales de equipos</p>
+    </div>
+</section>
+
+@code {
+    private int cantidadPartidos = 0;
+    List<EquipoDTO> Equipos;
+
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CargarDetalles();
+    }
+
+    private async Task CargarDetalles()
+    {
+
+    }
+
+}
