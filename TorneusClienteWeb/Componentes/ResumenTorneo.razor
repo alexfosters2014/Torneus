@@ -1,0 +1,75 @@
+﻿@inject FixtureServicio _servicioFixture
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Cantidad de equipos que participaron</p>
+        <p>@cantidadEquipoParticipantes</p>
+    </div>
+</section>
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Cantidad partidos jugados</p>
+        <p>@cantidadPartidosJugados</p>
+    </div>
+</section>
+
+<section class="card-centrada">
+    <div class="card-torneo">
+        <p>Tiempos Promedio por partido </p>
+        <p>@tiempoPromedio</p>
+    </div>
+</section>
+
+@if (puestos != null)
+{
+  <section class="card-centrada">
+    <div class="card-torneo">
+        <p>Ganador: @puestos.Ganador</p>
+        <p>Segundo puesto: @puestos.SegundoPuesto</p>
+    </div>
+</section>  
+}
+
+@if (puntajePorEquipo != null)
+{
+    foreach (var puntaje in puntajePorEquipo)
+    {
+        <p>@puntaje.Key : <span>@puntaje.Value</span></p>
+    }
+}
+
+
+
+
+
+<section class="card-centrada">
+    <div class="card-torneo">                                                           
+        <p>Puntaje totales de equipos</p>
+    </div>
+</section>
+
+@code {
+    private int cantidadPartidosJugados = 0;
+    private int cantidadEquipoParticipantes = 0;
+    private int tiempoPromedio = 0;
+    Dictionary<string, int> puntajePorEquipo = new();
+    PrimerSegundoPuestoModel puestos = new(); 
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await CargarDetalles();
+    }
+
+    private async Task CargarDetalles()
+    {
+        cantidadPartidosJugados = await _servicioFixture.CantidadPartidosJugados();
+        cantidadEquipoParticipantes = await _servicioFixture.CantidadEquiposParticipantes();
+        tiempoPromedio = _servicioFixture.TiempoPromedioMinutos;
+        puntajePorEquipo = await _servicioFixture.PuntajePorEquipo();
+        puestos = await _servicioFixture.PrimerSegundoPuesto();
+
+    }
+
+}

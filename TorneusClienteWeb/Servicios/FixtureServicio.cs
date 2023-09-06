@@ -433,11 +433,7 @@ namespace TorneusClienteWeb.Servicios
             {
                 for (int i = 0; i < cantidadEquiposAJugar; i+=2)
                 {
-                    //int indicePartido = 0;
-                    //for (int j = 0; j < cantidadPartidosJugarInicial; j++)
-                    //{
-                       int indicePartido = ObtenerIndicePartido(partidosElimDirecta[i/2].Id);
-                    //}
+                    int indicePartido = ObtenerIndicePartido(partidosElimDirecta[i/2].Id);
                     Partidos[indicePartido].EquipoLocal = equiposSegundaFase[i];
                     Partidos[indicePartido].EquipoVisitante = equiposSegundaFase[i+1];
                     partidosActualizar.Add(Partidos[indicePartido]);
@@ -548,10 +544,99 @@ namespace TorneusClienteWeb.Servicios
             }
         }
 
+        public async Task<bool> EsFinalTorneo()
+        {
+            bool partidosNoFinalizados = Partidos.Any(a => a.EstadoPartido != Util.EstadoPartido.FINALIZADO.ToString());
+            return !partidosNoFinalizados;
+        }
 
 
 
+        public async Task<int> CantidadPartidosJugados()
+        {
+            if (await EsFinalTorneo())
+            {
+               return Partidos.Count;
+            }
+            else
+            {
+                return -1;
+            }
+        }
 
+
+        public async Task<int> CantidadEquiposParticipantes()
+        {
+            if (await EsFinalTorneo())
+            {
+                int cantidadEquiposParticipantes = Partidos.SelectMany(sm => new[] { sm.EquipoLocal, sm.EquipoVisitante })
+                                                               .DistinctBy(d => d.Id)
+                                                               .Count();
+                return cantidadEquiposParticipantes;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+
+        public async Task<PrimerSegundoPuestoModel> PrimerSegundoPuesto()
+        {
+            if (await EsFinalTorneo())
+            {
+                var ultimoPartido = Partidos.Last();
+
+                PrimerSegundoPuestoModel primerSegundoPuesto = new()
+                {
+                    Ganador = ultimoPartido.PuntajeLocal > ultimoPartido.PuntajeVisitante ? ultimoPartido.EquipoLocal : ultimoPartido.EquipoVisitante,
+                    SegundoPuesto = ultimoPartido.PuntajeLocal > ultimoPartido.PuntajeVisitante ? ultimoPartido.EquipoVisitante : ultimoPartido.EquipoLocal
+                };
+                return primerSegundoPuesto;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+
+        public async Task<Dictionary<string, int>> PuntajePorEquipo()
+        {
+            Dictionary<string, int> EquiposPuntajes = new Dictionary<string, int>();
+
+            if (await EsFinalTorneo())
+            {
+                foreach (var partido in Partidos)
+                {
+                    if (EquiposPuntajes.ContainsKey(partido.EquipoLocal.Nombre))
+                    {
+                        EquiposPuntajes[partido.EquipoLocal.Nombre] += partido.PuntajeLocal;
+                    }
+                    else
+                    {
+                        EquiposPuntajes[partido.EquipoLocal.Nombre] = partido.PuntajeLocal;
+                    }
+
+                    if (EquiposPuntajes.ContainsKey(partido.EquipoVisitante.Nombre))
+                    {
+                        EquiposPuntajes[partido.EquipoVisitante.Nombre] += partido.PuntajeVisitante;
+                    }
+                    else
+                    {
+                        EquiposPuntajes[partido.EquipoVisitante.Nombre] = partido.PuntajeVisitante;
+                    }
+                }
+
+                var puntajeOrndenados = EquiposPuntajes.OrderByDescending(o => o.Value).ToDictionary(kvp => kvp.Key, kvp => kvp.Value); ;
+
+                return puntajeOrndenados;
+            }
+            else
+            {
+                return EquiposPuntajes;
+            }
+        }
 
 
 
