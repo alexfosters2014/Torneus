@@ -28,7 +28,8 @@ else
         {
             <MudFab Style="@_servicioMenu.ClassFabColor()" StartIcon="@Icons.Material.Filled.RemoveRedEye" Size="Size.Large" OnClick="VerTablaPosiciones" />
         }
-     
+            <MudFab Style="@_servicioMenu.ClassFabColorResultados()" StartIcon="@Icons.Material.Filled.AlignVerticalBottom" Size="Size.Large" OnClick="VerResumenTorneo" />
+   
     }
     else
     {
@@ -60,6 +61,7 @@ else
         _hubConnection.On<List<PartidoDTO>>("RecibirActualizarPartidos", async (partidos) =>
       {
           await _servicioNotificacionesSignalR.ActualizarPartidosSignalR(partidos);
+          await EsFinalTorneo();
       });
 
         _hubConnection.On<int,int>("RecibirAccesoPlanillero", async (usuarioId,torneoId) =>
@@ -96,11 +98,21 @@ else
         var result = await _dialogService.Show<TablaPosicionesGrupo>("Tabla de posiciones.").Result;
     }
 
+    private async Task VerResumenTorneo()
+    {
+        if (await EsFinalTorneo())
+        {
+            var result = await _dialogService.Show<ResumenTorneo>("Resumen torneo").Result;
+        }
 
+    }
 
-
-
-
+    private async Task<bool> EsFinalTorneo()
+    {
+        bool EsFinaldePartido = await _servicioFixture.EsFinalTorneo();
+        return EsFinaldePartido;
+    }
+                                                                                                                                                                                                                                    
 
 
 
