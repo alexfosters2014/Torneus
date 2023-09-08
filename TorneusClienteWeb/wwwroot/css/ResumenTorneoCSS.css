@@ -1,0 +1,99 @@
+﻿.card-resumen div {
+    width: 100%;
+    background: linear-gradient(90deg, rgba(214,160,228,1) 0%, rgba(244,241,245,1) 100%);
+    border-radius: 15px;
+    padding: 8px;
+    margin-bottom: 20px;
+    box-shadow: 1px 2px 8px 0px rgba(0,0,0,0.75);
+}
+.card-resumen {
+    margin: 15px;
+}
+
+.flex-resumen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.tamanioMedioRem {
+    font-size: 1.2rem;
+    color: purple;
+}
+
+.tamanioGrandeRem {
+    font-size: 2.1rem;
+    color: blue;
+}
+
+.borde-izq {
+    border-left: 4px solid blue;
+}
+
+.borde-der {
+    border-right: 4px solid blue;
+}
+
+.borde-arriba {
+    border-top: 4px solid blue;
+    ;
+}
+
+.borde-abajo {
+    border-bottom: 4px solid blue;
+    ;
+}
+
+.tablaPuestos {
+    text-align: center;
+   
+}
+
+.tablaPuestos tr{
+    background-color: transparent !important;
+}
+
+.card-resumen img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+}
+
+.card-resumen p {
+    padding: 3px;
+    margin: 0px;
+}
+
+.altura-podio {
+    height: 80px;
+}
+
+.campana-chica {
+    width: 30px !important;
+    height: 30px !important;
+}
+
+.sombra-final {
+    box-shadow: 10px 10px 16px -2px rgba(0,0,0,0.75);
+}
+
+.centrarTexto {
+    text-align: center;
+}
+
+.titulo-Info {
+    color: purple;
+    font-size: 1.1rem;
+}
+
+.titulo-bold {
+    font-weight: bold;
+}
+
+.tablaPuestos p {
+    color: #e60000;
+    font-size: 1.1rem;
+}

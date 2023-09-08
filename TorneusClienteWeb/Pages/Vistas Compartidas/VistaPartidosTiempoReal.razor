@@ -7,6 +7,8 @@
 @inject UsuarioServicio _servicioUsuario
 @inject AutPlanilleroServicio _servicioAutPlanillero
 @inject IDialogService _dialogService
+@inject ISnackbar _snackBar
+
 
 @if (Partidos == null)
 {
@@ -103,6 +105,10 @@ else
         if (await EsFinalTorneo())
         {
             var result = await _dialogService.Show<ResumenTorneo>("Resumen torneo").Result;
+        }
+        else
+        {
+            _snackBar.Add("El resumen estará disponible una vez termine el torneo", Severity.Info);
         }
 
     }
