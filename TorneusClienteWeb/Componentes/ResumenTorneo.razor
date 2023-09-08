@@ -1,58 +1,96 @@
 ﻿@inject FixtureServicio _servicioFixture
+@inject IConfiguration _config
 
-<section class="card-centrada">
-    <div class="card-torneo">
-        <p>Cantidad de equipos que participaron</p>
-        <p>@cantidadEquipoParticipantes</p>
-    </div>
-</section>
-
-<section class="card-centrada">
-    <div class="card-torneo">
-        <p>Cantidad partidos jugados</p>
-        <p>@cantidadPartidosJugados</p>
-    </div>
-</section>
-
-<section class="card-centrada">
-    <div class="card-torneo">
-        <p>Tiempos Promedio por partido </p>
-        <p>@tiempoPromedio</p>
-    </div>
-</section>
 
 @if (puestos != null)
 {
-  <section class="card-centrada">
-    <div class="card-torneo">
-        <p>Ganador: @puestos.Ganador</p>
-        <p>Segundo puesto: @puestos.SegundoPuesto</p>
-    </div>
-</section>  
+
+<section class="card-resumen">
+
+        <div class="flex-resumen">
+            <table class="tablaPuestos">
+                <tr>    
+                    <td></td>
+                    <td class="tamanioMedioRem borde-abajo">
+                        <article>
+                            <img src="@VerLogoURL(puestos.Ganador.Logo)" alt="">
+                            <p>@puestos.Ganador.Nombre</p>
+                        </article>
+                    </td>
+                </tr> 
+                <tr>
+                    <td></td>
+                    <td class="borde-izq altura-podio tamanioGrandeRem" style="width: 50%;">
+                        <img src="imagenes/campana.gif" alt="" class="campana-chica">
+                        1ro
+                     </td>
+                    <td class="tamanioMedioRem borde-izq borde-abajo">
+                        <article>
+                            <img src="@VerLogoURL(puestos.SegundoPuesto.Logo)" alt="">
+                            <p>@puestos.SegundoPuesto.Nombre</p>
+                        </article>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td class="borde-izq"> </td>
+                    <td class="borde-der altura-podio tamanioGrandeRem" style="width: 50%;">2do</td>
+                </tr>
+            </table>
+        </div>
+    
+
+        <div class="centrarTexto">
+            <p class="titulo-Info">Cantidad de equipos que participaron</p>
+            <p class="tamanioGrandeRem titulo-bold">@cantidadEquipoParticipantes</p>
+        </div>
+
+
+        <div class="centrarTexto">
+            <p class="titulo-Info">Cantidad partidos jugados</p>
+            <p class="tamanioGrandeRem titulo-bold">@cantidadPartidosJugados</p>
+        </div>
+
+
+        <div class="centrarTexto">
+            <p class="titulo-Info">Tiempo promedio por partido </p>
+            <p class="tamanioGrandeRem titulo-bold">@tiempoPromedio min</p>
+        </div>
+
+
+        
+        <div class="flex-resumen">                                                           
+            <p class="titulo-Info">Puntaje totales de equipos</p>
+            <table class="table table-bordered border-primary">
+                <tr>
+                    <td>Equipos</td>
+                    <td>Puntaje</td>
+                </tr>
+
+            @foreach (var puntajeEquipo in puntajePorEquipo)
+            {
+                 <tr>
+                    <td>@puntajeEquipo.Key</td>
+                    <td>@puntajeEquipo.Value</td>
+                 </tr>
+            }
+
+            </table>
+        </div>
+
+
+    </section>
+
 }
 
-@if (puntajePorEquipo != null)
-{
-    foreach (var puntaje in puntajePorEquipo)
-    {
-        <p>@puntaje.Key : <span>@puntaje.Value</span></p>
-    }
-}
 
 
-
-
-
-<section class="card-centrada">
-    <div class="card-torneo">                                                           
-        <p>Puntaje totales de equipos</p>
-    </div>
-</section>
 
 @code {
     private int cantidadPartidosJugados = 0;
     private int cantidadEquipoParticipantes = 0;
     private int tiempoPromedio = 0;
+    private string baseUrlImagen = "";
     Dictionary<string, int> puntajePorEquipo = new();
     PrimerSegundoPuestoModel puestos = new(); 
 
@@ -64,12 +102,19 @@
 
     private async Task CargarDetalles()
     {
+        baseUrlImagen = _config["UrlBaseParaImagenes"];
         cantidadPartidosJugados = await _servicioFixture.CantidadPartidosJugados();
         cantidadEquipoParticipantes = await _servicioFixture.CantidadEquiposParticipantes();
         tiempoPromedio = _servicioFixture.TiempoPromedioMinutos;
         puntajePorEquipo = await _servicioFixture.PuntajePorEquipo();
         puestos = await _servicioFixture.PrimerSegundoPuesto();
 
+    }
+
+    private string VerLogoURL(string logoEquipoRuta)
+    {
+        string rutaImagen = $"{baseUrlImagen}{logoEquipoRuta}";
+        return rutaImagen;
     }
 
 }
