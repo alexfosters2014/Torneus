@@ -20,13 +20,13 @@
 
      @if (rolUsuario == Util.Roles.EQUIPO.ToString())
     {
-        <button @onclick="BajaInscripcion"><span class="fas fa-trash-alt flotando-izquierda"></span></button>
+        <button @onclick="BajaInscripcion"><span class="fas fa-trash-alt flotando-izquierda-cash"></span></button>
     }
 
     @if (rolUsuario == Util.Roles.ORGANIZADOR.ToString() && InscripcionDTO.Estado == Util.EstadoPago.PENDIENTE.ToString())
     {
-        <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda"></span></button>
-        <button @onclick="RechazoInscripcion"><span class="fas fa-trash-alt flotando-izquierda"></span></button>
+        <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda-cash"></span></button>
+        <button @onclick="RechazoInscripcion"><span class="fas fa-trash-alt flotando-izquierda-delete"></span></button>
     }
 </section>
 
