@@ -266,6 +266,34 @@ namespace WebApiTorneus.Controllers
         }
 
 
+        /// <summary>
+        /// Permite al usuario con rol organizador rechazar una inscripcion que no se ha pagado en efectivo
+        /// </summary>
+        /// <remarks>
+        /// Este endpoint permite al usuario con rol organizador rechazar una inscripcion que no se ha pagado en efectivo
+        /// </remarks>
+        /// <response code="200">OK</response>
+        /// <response code="400">Validaciones varias erroneas</response>
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpDelete("RechazarInscripcion/{inscripcionId}")]
+        public async Task<IActionResult> RechazarInscripcionEfectivoOrganizador(int inscripcionId)
+        {
+            try
+            {
+                if (inscripcionId < 1) throw new Exception("No se reconoce ninguna inscripcion");
+
+                bool inscripcionRechazada = await _inscripcionService.RechazarInscripcionEfectivo(inscripcionId);
+                return Ok(inscripcionRechazada);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
+
 
     }
 }

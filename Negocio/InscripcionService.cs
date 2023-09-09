@@ -234,6 +234,26 @@ namespace Negocio
 
         }
 
+        public async Task<bool> RechazarInscripcionEfectivo(int inscripcionId)
+        {
+            try
+            {
+                Inscripcion inscripcionRechazado = await _db.Inscripciones.Include(inc => inc.Torneo)
+                                                                        .SingleOrDefaultAsync(ins => ins.Id == inscripcionId);
+                if (inscripcionRechazado == null) throw new Exception("No existe la la isncripcion buscada. W91");
+
+                inscripcionRechazado.Estado = Util.EstadoPago.RECHAZADO.ToString();
+                int cantidadEliminados = await _db.SaveChangesAsync();
+
+                return cantidadEliminados > 0;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
 
 
 

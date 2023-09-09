@@ -174,6 +174,29 @@ namespace TorneusClienteWeb.Servicios
             }
         }
 
+        public async Task<bool> RechazoInscripcionPorOrganizador(int inscripcionId)
+        {
+            try
+            {
+                bool resultado = await _inscripcionServicio.RechazarInscripcionesTorneoPorOrganizador(inscripcionId);
+                if (resultado)
+                {
+                    MedioPagoEfectivoDTO inscripcionEf = new()
+                    {
+                        Estado = Util.EstadoPago.RECHAZADO.ToString(),
+                        InscripcionId = inscripcionId
+                    };
+
+                    int posicion = BuscarIndexInscripcion(inscripcionEf.InscripcionId);
+                    ActualizarEstadoInscripcionPorIndex(posicion, inscripcionEf.Estado);
+                }
+                return resultado;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
 
     }
