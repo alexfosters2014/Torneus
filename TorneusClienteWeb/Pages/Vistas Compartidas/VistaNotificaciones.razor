@@ -30,6 +30,8 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        _servicioMenu.ActualizarTitulo("Notificaciones");
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/Principal");
 
         _hubConnection.On<NotificacionDTO>("RecibirNuevaNotificacion", async (notificacion) =>
        {

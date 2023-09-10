@@ -51,6 +51,8 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        _servicioMenu.ActualizarTitulo("Gestión autorizaciones");
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Gestiones");
         await ActualizarListado();
     }
 

@@ -4,9 +4,9 @@
 @inject ISnackbar _snackBar
 
 
-<section class="card-general card-general-relativo">
+<section class="card-general card-general-relativo p-4">
     <article class="d-flex justify-content-center align-items-center flex-column">
-        <span>@TituloSegunRol()</span>
+        <span>@TituloSegunRol() (@EqupoInscripto()) </span>
         <span>$ @InscripcionDTO.Monto</span>
     </article>
 
@@ -114,6 +114,10 @@
         //StateHasChanged();
     }
 
-
+    private string EqupoInscripto()
+    {
+        string abreviado = InscripcionDTO.Equipo.Nombre.Length > 10 ? new string(InscripcionDTO.Equipo.Nombre.Take(10).ToArray()) + "..." : InscripcionDTO.Equipo.Nombre;
+        return abreviado;
+    }
 
 }

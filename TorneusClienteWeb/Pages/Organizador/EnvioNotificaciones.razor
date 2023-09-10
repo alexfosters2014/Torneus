@@ -1,5 +1,6 @@
 ﻿@page "/ORGANIZADOR/EnvioNotificaciones"
 @inject NotificacionServicio _servicioNotificacion
+@inject ServicioMenu _servicioMenu
 @inject ISnackbar _snackBar
 @inject IJSRuntime _js
 
@@ -23,6 +24,8 @@
     protected async override Task OnInitializedAsync()
     {
         _servicioNotificacion.OnActualizarListadoNotificacionesEnviadasEvent += Actualizar;
+        _servicioMenu.ActualizarTitulo("Notificaciones");
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Principal");
         Actualizar();
     }
 

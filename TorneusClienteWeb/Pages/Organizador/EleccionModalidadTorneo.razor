@@ -4,6 +4,7 @@
 @inject NavigationManager _nav
 @inject IDialogService _dialogService
 @inject FixtureServicio _servicioFixture
+@inject ServicioMenu _servicioMenu
 
 <section class="d-flex flex-column justify-content-center align-items-center">
 
@@ -47,6 +48,8 @@
 
     protected async override Task OnInitializedAsync()
     {
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
+        _servicioMenu.ActualizarTitulo("Fixture");
         await CargaInicial();
     }
 

@@ -5,9 +5,9 @@
 <div class="flex-column-customizable">
     <div style="width:85vw;margin-bottom:90px;">
         <BotonAnimado Texto="Mis inscripciones" Icono="@Util.IconoInscripcion" OnClick="IrAMisInscripciones" />
-        <BotonAnimado Texto="Torneos Jugados" Icono="@Util.IconoJugados" OnClick="IrATorneosJugados" />
+       @* <BotonAnimado Texto="Torneos Jugados" Icono="@Util.IconoJugados" OnClick="IrATorneosJugados" />*@
         <BotonAnimado Texto="Mis Equipos" Icono="@Util.IconoEquipo" OnClick="IrAMisEquipos" />
-        <BotonAnimado Texto="Mis Medallas" Icono="@Util.IconoMedalla" OnClick="IrAMisMedallas" />
+      @*  <BotonAnimado Texto="Mis Medallas" Icono="@Util.IconoMedalla" OnClick="IrAMisMedallas" />*@
     </div>
     
 </div>
@@ -17,7 +17,7 @@
 @code {
     protected async override Task OnInitializedAsync()
     {
-        _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/Principal");
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/Gestiones");
         _servicioMenu.ActualizarTitulo("Gestión");
     }
 

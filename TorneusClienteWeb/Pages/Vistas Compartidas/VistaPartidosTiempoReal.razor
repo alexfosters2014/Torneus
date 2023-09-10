@@ -48,6 +48,8 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
+        _servicioMenu.ActualizarTitulo(_servicioTorneo.ObtenerTorneoActual().Nombre);
         await CargaInicial();
     }
 
