@@ -18,14 +18,15 @@
         <span>@InscripcionDTO.Estado.ToUpper()</span>
     </article>
 
-    @if (rolUsuario == Util.Roles.EQUIPO.ToString())
+     @if (rolUsuario == Util.Roles.EQUIPO.ToString())
     {
-        <button @onclick="BajaInscripcion"><span class="fas fa-trash-alt flotando-izquierda"></span></button>
+        <button @onclick="BajaInscripcion"><span class="fas fa-trash-alt flotando-izquierda-cash"></span></button>
     }
 
-    @if (rolUsuario == Util.Roles.ORGANIZADOR.ToString() && InscripcionDTO.Estado != Util.EstadoPago.PAGADO.ToString())
+    @if (rolUsuario == Util.Roles.ORGANIZADOR.ToString() && InscripcionDTO.Estado == Util.EstadoPago.PENDIENTE.ToString())
     {
-        <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda"></span></button>
+        <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda-cash"></span></button>
+        <button @onclick="RechazoInscripcion"><span class="fas fa-trash-alt flotando-izquierda-delete"></span></button>
     }
 </section>
 
@@ -61,6 +62,27 @@
             bool resultado = await _servicioInscripcion.BajaInscripcion(InscripcionDTO.Id);
 
             _snackBar.Add("Se ha dado de baja correctamente", Severity.Success);
+            await ActualizarListado.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            _snackBar.Add(ex.Message, Severity.Warning);
+        }
+
+    }
+
+
+    private async Task RechazoInscripcion()
+    {
+        try
+        {
+            var result = await _dialogService.Show<DialogComponent>("Deseas dar de baja tu inscripción a este torneo?").Result;
+
+            if (result.Canceled) return;
+
+            bool resultado = await _servicioInscripcion.RechazoInscripcionPorOrganizador(InscripcionDTO.Id);
+
+            _snackBar.Add("Se ha rechazado correctamente", Severity.Success);
             await ActualizarListado.InvokeAsync();
         }
         catch (Exception ex)

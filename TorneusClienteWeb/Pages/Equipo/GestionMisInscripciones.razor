@@ -40,8 +40,14 @@ else
         _hubConnection.On<WebHook>("RecibidorNotificacionMercadoPago", async (webHook) =>
        {
            StateHasChanged();
-
        });
+
+        _hubConnection.On<int,string>("RecibirActualizacionInscripcion", async (inscripcionId, estado) =>
+      {
+          _servicioInscripcion.SetInscripcion(inscripcionId, estado);
+          await ActualizarListado();
+
+      });
     }
 
     private async Task ActualizarListado()

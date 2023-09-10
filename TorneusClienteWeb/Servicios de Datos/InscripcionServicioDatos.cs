@@ -208,6 +208,38 @@ namespace TorneusClienteWeb.Servicios_de_Datos
 
 
 
+        public async Task<bool> RechazarInscripcionesTorneoPorOrganizador(int inscripcionId)
+        {
+            try
+            {
+                if (inscripcionId < 1) throw new Exception("La inscripcion no existe");
+
+                string token = _usuarioServicio.ObtenerUsuarioLogueado().Token;
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.DeleteAsync($"api/Inscripcion/RechazarInscripcion/{inscripcionId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var inscripcionRechazada = JsonConvert.DeserializeObject<bool>(content);
+                    return inscripcionRechazada;
+                }
+                else
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    throw new Exception(content);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+        }
+
+
+
 
     }
 }
