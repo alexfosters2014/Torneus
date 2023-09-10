@@ -13,5 +13,8 @@
 
 function ScrollUltimaLinea() {
     const notificacionContainer = document.getElementById("notificaciones-container");
-    notificacionContainer.scrollTop = notificacionContainer.scrollHeight;
+    if (notificacionContainer) {
+        notificacionContainer.scrollTop = notificacionContainer.scrollHeight;
+    }
+    
 }

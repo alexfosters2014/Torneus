@@ -28,14 +28,22 @@
 
     protected async override Task OnAfterRenderAsync(bool firstRender)
     {
-        await _js.InvokeVoidAsync("ScrollUltimaLinea");
+        if (firstRender)
+        {
+            await DeplazarseUltimoMensajeEnviado();
+        }
     }
 
     private async void Actualizar()
     {
         Notificaciones = await _servicioNotificacion.ObtenerNotificacionesOrganizador();
         StateHasChanged();
+        await DeplazarseUltimoMensajeEnviado();
     }
 
+    private async Task DeplazarseUltimoMensajeEnviado()
+    {
+        await _js.InvokeVoidAsync("ScrollUltimaLinea");
+    }
 
 }
