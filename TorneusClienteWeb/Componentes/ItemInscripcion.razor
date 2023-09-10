@@ -26,7 +26,7 @@
     @if (rolUsuario == Util.Roles.ORGANIZADOR.ToString() && InscripcionDTO.Estado == Util.EstadoPago.PENDIENTE.ToString())
     {
         <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda-cash"></span></button>
-        <button @onclick="RechazoInscripcion"><span class="fas fa-trash-alt flotando-izquierda-delete"></span></button>
+        <button @onclick="RechazoInscripcion"><span class="fas fa-minus-circle"></span></button>
     }
 </section>
 
