@@ -1,6 +1,7 @@
 ﻿using BDTorneus;
 using DTOs_Compartidos.DTOs;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Identity.Client;
 using Negocio.DTOs;
 using System.Drawing;
@@ -16,15 +17,18 @@ namespace TorneusClienteWeb.Servicios
         [Inject] private UsuarioServicio _usuarioServicio { get; set; }
         [Inject] private InscripcionServicioDatos _inscripcionServicio { get; set; }
 
+        [Inject] private HubConnection _hubConnection { get; set; }
+
         private List<InscripcionDTO> _inscripciones { get; set; } = new List<InscripcionDTO>();
 
         private InscripcionDTO _inscripcionSeleccionado;
 
-        public InscripcionServicio(TorneoServicio torneoServicio, UsuarioServicio usuarioServicio, InscripcionServicioDatos inscripcionServicio)
+        public InscripcionServicio(TorneoServicio torneoServicio, UsuarioServicio usuarioServicio, InscripcionServicioDatos inscripcionServicio, HubConnection hubConnection)
         {
             _torneoServicio = torneoServicio;
             _usuarioServicio = usuarioServicio;
             _inscripcionServicio = inscripcionServicio;
+            _hubConnection = hubConnection;
         }
 
         private async Task CargarInscripciones()
@@ -57,6 +61,21 @@ namespace TorneusClienteWeb.Servicios
         {
             _inscripciones = await _inscripcionServicio.ObtenerInscripcionesTorneo(torneoId);
             return _inscripciones;
+        }
+
+        public void SetInscripcion(int inscripcionId, string estado)
+        {
+            int inscripcionPosicion = BuscarIndice(inscripcionId);
+
+            if (inscripcionPosicion < 0) return;
+
+            _inscripciones[inscripcionPosicion].Estado = estado;
+
+        }
+
+        private int BuscarIndice(int inscripcionId)
+        {
+            return _inscripciones.FindIndex(s => s.Id == inscripcionId);
         }
 
 
@@ -122,6 +141,9 @@ namespace TorneusClienteWeb.Servicios
 
                 int posicion = BuscarIndexInscripcion(inscripcionEf.InscripcionId);
                 ActualizarEstadoInscripcionPorIndex(posicion, inscripcionEf.Estado);
+
+                await _hubConnection.SendAsync("EnviarActualizacionInscripcion", inscripcionEf.InscripcionId, inscripcionEf.Estado);
+
                 return resultado;
             }
             catch (Exception ex)
@@ -189,6 +211,8 @@ namespace TorneusClienteWeb.Servicios
 
                     int posicion = BuscarIndexInscripcion(inscripcionEf.InscripcionId);
                     ActualizarEstadoInscripcionPorIndex(posicion, inscripcionEf.Estado);
+
+                    await _hubConnection.SendAsync("EnviarActualizacionInscripcion", inscripcionEf.InscripcionId, inscripcionEf.Estado);
                 }
                 return resultado;
             }
