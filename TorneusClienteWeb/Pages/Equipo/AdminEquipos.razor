@@ -39,7 +39,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.EQUIPO.ToString())) _nav.NavigateTo("/");
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.EQUIPO.ToString())) _nav.NavigateTo("/",true);
 
         EquiposDTO = await _servicioEquipo.ObtenerEquiposPorAdministrador();
     }

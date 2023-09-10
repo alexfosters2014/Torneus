@@ -1,4 +1,5 @@
 ﻿@inject TorneoServicio _servicioTorneo
+@inject UsuarioServicio _servicioUsuario
 @inject ISnackbar _snackBar
 
 <MudDialog>
@@ -44,6 +45,7 @@
     private List<TorneoDTO> TorneosVigentes = new();
     private NotificacionDTO notificacion = new();
 
+
     private int  torneoId = 0;
     private bool dirigidoAGeneral = true;
 
@@ -52,7 +54,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-        TorneosVigentes = await _servicioTorneo.ObtenerTorneosVigentes();
+        TorneosVigentes = await _servicioTorneo.ObtenerTorneosOrganizador(_servicioUsuario.ObtenerUsuarioLogueado().Id);
     }
 
     private void Cerrar() => MudDialog.Cancel();

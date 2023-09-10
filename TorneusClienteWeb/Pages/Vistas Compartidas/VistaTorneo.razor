@@ -17,10 +17,20 @@
 
     protected async override Task OnInitializedAsync()
     {
-         if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/",true);
 
+        string rolParaCabecera = "";
         _servicioMenu.ActualizarTitulo("Torneo");
-        _servicioMenu.ActualizarNavegacionPOP(true, false, $"/{_servicioUsuario.ObtenerUsuarioLogueado().Rol}/Principal");
+        if (_servicioUsuario.ObtenerUsuarioLogueado().Rol == Util.Roles.PLANILLERO.ToString() || 
+            _servicioUsuario.ObtenerUsuarioLogueado().Rol == Util.Roles.ESPECTADOR.ToString())
+        {
+            rolParaCabecera = "GENERAL";
+        }
+        else
+        {
+            rolParaCabecera = _servicioUsuario.ObtenerUsuarioLogueado().Rol;
+        }
+        _servicioMenu.ActualizarNavegacionPOP(true, false, $"/{rolParaCabecera}/Principal");
         TorneoVistaDTO = _servicioTorneo.ObtenerTorneoActual();
 
         _hubConnection.On<TorneoDTO>("RecibidorNotficacionModificacion", async (torneoDTO) =>

@@ -160,7 +160,7 @@
 
     protected async override Task OnInitializedAsync()
     {
-          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/",true);
 
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
         _servicioMenu.ActualizarTitulo("Modificar datos");

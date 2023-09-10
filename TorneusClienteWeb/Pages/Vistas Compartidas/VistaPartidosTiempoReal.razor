@@ -49,7 +49,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/",true);
 
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
         _servicioMenu.ActualizarTitulo(_servicioTorneo.ObtenerTorneoActual().Nombre);

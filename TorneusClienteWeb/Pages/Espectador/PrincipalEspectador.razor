@@ -38,7 +38,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/",true);
 
         ActualizarMenu();
         ActualizarTorneos();
