@@ -5,6 +5,7 @@
 @inject UsuarioServicio _servicioUsuario
 @inject ISnackbar _snackbar
 @inject HubConnection _hubConnection
+@inject NavigationManager _nav
 
 @if (PlanillerosTorneosGrupos == null)
 { 
@@ -51,6 +52,10 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+
+        _servicioMenu.ActualizarTitulo("Gestión autorizaciones");
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Gestiones");
         await ActualizarListado();
     }
 

@@ -8,6 +8,7 @@
 @inject AutPlanilleroServicio _servicioAutPlanillero
 @inject IDialogService _dialogService
 @inject ISnackbar _snackBar
+@inject NavigationManager _nav
 
 
 @if (Partidos == null)
@@ -48,6 +49,10 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
+        _servicioMenu.ActualizarTitulo(_servicioTorneo.ObtenerTorneoActual().Nombre);
         await CargaInicial();
     }
 

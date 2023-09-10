@@ -11,7 +11,8 @@
     font-size: 0.9rem;
 }
 
-.letra-oscura {
+.letra-oscura
+{
     color: black;
     font-size: 0.9rem;
 }
@@ -92,4 +93,10 @@
     position: fixed;
     bottom: 80px;
     width: 96%;
+}
+
+.letra-bold {
+    font-weight: 500;
+    color:red;
+    font-size: 0.9rem;
 }

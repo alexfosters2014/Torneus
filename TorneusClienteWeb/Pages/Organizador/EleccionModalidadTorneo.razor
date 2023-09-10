@@ -4,6 +4,8 @@
 @inject NavigationManager _nav
 @inject IDialogService _dialogService
 @inject FixtureServicio _servicioFixture
+@inject ServicioMenu _servicioMenu
+@inject UsuarioServicio _servicioUsuario
 
 <section class="d-flex flex-column justify-content-center align-items-center">
 
@@ -47,6 +49,10 @@
 
     protected async override Task OnInitializedAsync()
     {
+          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
+        _servicioMenu.ActualizarTitulo("Fixture");
         await CargaInicial();
     }
 

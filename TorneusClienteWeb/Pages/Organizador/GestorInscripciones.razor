@@ -78,7 +78,9 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-        _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Principal");
+          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Gestiones");
         _servicioMenu.ActualizarTitulo("Gestor de inscripciones");
         baseURLImagenes = _config[Util.URL_BASE_CONFIG_IMAGENES];
         await CargarTorneos();

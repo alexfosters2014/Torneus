@@ -1,12 +1,19 @@
 ﻿@page "/ORGANIZADOR/EnvioNotificaciones"
 @inject NotificacionServicio _servicioNotificacion
+@inject ServicioMenu _servicioMenu
 @inject ISnackbar _snackBar
+@inject IJSRuntime _js
+@inject UsuarioServicio _servicioUsuario
+@inject NavigationManager _nav
 
 
-@foreach (var notificacion in Notificaciones)
-{
-    <ItemNotificacionOrganizador Notificacion="notificacion" />
-}
+<div id="notificaciones-container" style="overflow-y: auto; height: 75vh;">
+    @foreach (var notificacion in Notificaciones)
+    {
+        <ItemNotificacionOrganizador Notificacion="notificacion" />
+    }
+</div>
+
 
 <EspacioVertical Altura="80px" />
 <div>
@@ -18,17 +25,32 @@
 
     protected async override Task OnInitializedAsync()
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+
         _servicioNotificacion.OnActualizarListadoNotificacionesEnviadasEvent += Actualizar;
+        _servicioMenu.ActualizarTitulo("Notificaciones");
+        _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Principal");
         Actualizar();
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await DeplazarseUltimoMensajeEnviado();
+        }
     }
 
     private async void Actualizar()
     {
         Notificaciones = await _servicioNotificacion.ObtenerNotificacionesOrganizador();
         StateHasChanged();
+        await DeplazarseUltimoMensajeEnviado();
     }
 
-
-
+    private async Task DeplazarseUltimoMensajeEnviado()
+    {
+        await _js.InvokeVoidAsync("ScrollUltimaLinea");
+    }
 
 }

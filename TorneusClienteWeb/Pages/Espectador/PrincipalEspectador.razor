@@ -38,6 +38,8 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+
         ActualizarMenu();
         ActualizarTorneos();
         await Iniciar();
@@ -65,8 +67,7 @@ else
         menusItems = new List<MenuItem>()
         {
             new MenuItem ("Mensajes","fa fa-envelope","/VistaNotificaciones"),
-            new MenuItem ("Torneos","fa fa-trophy","/GENERAL/Principal"),
-            new MenuItem ("Otros","fas fa-volleyball-ball","/GENERAL/Gestiones")
+            new MenuItem ("Torneos","fa fa-trophy","/GENERAL/Principal")
         };
         _servicioMenu.ActualizarItems(menusItems);
         _servicioMenu.ActualizarTitulo("Torneos");

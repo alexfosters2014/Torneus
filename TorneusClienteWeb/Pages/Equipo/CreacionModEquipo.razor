@@ -6,6 +6,7 @@
 @inject JugadorServicio _servicioJugador
 @inject IMapper _autoMapper
 @inject IDialogService _dialogService
+@inject UsuarioServicio _servicioUsuario
 
 
 
@@ -147,6 +148,7 @@
 
     protected async override Task OnInitializedAsync()
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.EQUIPO.ToString())) _nav.NavigateTo("/");
 
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/AdminEquipos");
         _servicioMenu.ActualizarTitulo("Registro de equipo");
