@@ -159,7 +159,16 @@ namespace TorneusClienteWeb.Servicios
             }
         }
 
+        public async Task<bool> UsuarioEstaAutorizadoPágina(string rolAutorizado)
+        {
+            if (_usuarioLogueado == null) return false;
 
+            string rolActual = _usuarioLogueado.Rol;
+
+            if (rolAutorizado == "GENERAL") return true;
+
+            return rolActual == rolAutorizado;
+        }
 
 
     }

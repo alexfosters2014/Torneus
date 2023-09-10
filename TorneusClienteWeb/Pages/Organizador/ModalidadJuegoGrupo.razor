@@ -3,6 +3,7 @@
 @inject ISnackbar _snackbar
 @inject FixtureServicio _servicioFixture
 @inject NavigationManager _nav
+@inject UsuarioServicio _servicioUsuario
 
 
         <MudNumericField @bind-Value="cantidadGrupos"
@@ -63,6 +64,8 @@
 
     protected async override Task OnInitializedAsync()
     {
+          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+
         await CargaInicial();
     }
 

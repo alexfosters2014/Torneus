@@ -4,6 +4,7 @@
 @inject ServicioMenu _servicioMenu
 @inject NotificacionesSignalRService _servicioNotificacionesSignalR
 @inject HubConnection _hubConnection
+@inject NavigationManager _nav
 
 
 @if (TorneoVistaDTO.Id > 0)
@@ -16,6 +17,8 @@
 
     protected async override Task OnInitializedAsync()
     {
+         if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+
         _servicioMenu.ActualizarTitulo("Torneo");
         _servicioMenu.ActualizarNavegacionPOP(true, false, $"/{_servicioUsuario.ObtenerUsuarioLogueado().Rol}/Principal");
         TorneoVistaDTO = _servicioTorneo.ObtenerTorneoActual();

@@ -160,6 +160,8 @@
 
     protected async override Task OnInitializedAsync()
     {
+          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/");
+
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/VisualizadorTorneo");
         _servicioMenu.ActualizarTitulo("Modificar datos");
         TorneoEditDTO = _autoMapper.Map<TorneoDTO, TorneoActualizacionDTO>(_servicioTorneo.ObtenerTorneoActual());

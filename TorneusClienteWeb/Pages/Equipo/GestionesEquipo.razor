@@ -1,6 +1,7 @@
 ﻿@page "/EQUIPO/Gestiones"
 @inject NavigationManager _nav
 @inject ServicioMenu _servicioMenu
+@inject UsuarioServicio _servicioUsuario
 
 <div class="flex-column-customizable">
     <div style="width:85vw;margin-bottom:90px;">
@@ -17,6 +18,8 @@
 @code {
     protected async override Task OnInitializedAsync()
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.EQUIPO.ToString())) _nav.NavigateTo("/");
+
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/Gestiones");
         _servicioMenu.ActualizarTitulo("Gestión");
     }

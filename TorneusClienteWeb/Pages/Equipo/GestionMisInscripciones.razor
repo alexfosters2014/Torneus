@@ -3,6 +3,7 @@
 @inject HubConnection _hubConnection
 @inject ServicioMenu _servicioMenu
 @inject InscripcionServicio _servicioInscripcion
+@inject UsuarioServicio _servicioUsuario
 
 
 @if (Inscripciones != null)
@@ -31,6 +32,8 @@ else
     protected async override Task OnInitializedAsync()
 
     {
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.EQUIPO.ToString())) _nav.NavigateTo("/");
+
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/Gestiones");
         _servicioMenu.ActualizarTitulo("Mis inscripciones");
 

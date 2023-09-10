@@ -3,6 +3,7 @@
 @inject UsuarioServicio _servicioUsuario
 @inject HubConnection _hubConnection
 @inject ServicioMenu _servicioMenu
+@inject NavigationManager _nav
 
 
 @if (Notificaciones != null)
@@ -30,6 +31,8 @@ else
 
     protected async override Task OnInitializedAsync()
     {
+        if (! await _servicioUsuario.UsuarioEstaAutorizadoPágina("GENERAL")) _nav.NavigateTo("/");
+        
         _servicioMenu.ActualizarTitulo("Notificaciones");
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/EQUIPO/Principal");
 
