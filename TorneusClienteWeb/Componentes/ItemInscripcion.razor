@@ -76,7 +76,7 @@
     {
         try
         {
-            var result = await _dialogService.Show<DialogComponent>("Deseas dar de baja tu inscripción a este torneo?").Result;
+            var result = await _dialogService.Show<DialogComponent>("Deseas rechazar la inscripción a este torneo?").Result;
 
             if (result.Canceled) return;
 
