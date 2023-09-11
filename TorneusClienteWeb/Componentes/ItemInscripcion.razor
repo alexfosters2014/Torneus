@@ -6,7 +6,7 @@
 
 <section class="card-general card-general-relativo p-4">
     <article class="d-flex justify-content-center align-items-center flex-column">
-        <span>@TituloSegunRol() (@EqupoInscripto()) </span>
+        <span>@TituloSegunRol() @EqupoInscripto() </span>
         <span>$ @InscripcionDTO.Monto</span>
     </article>
 
@@ -26,7 +26,7 @@
     @if (rolUsuario == Util.Roles.ORGANIZADOR.ToString() && InscripcionDTO.Estado == Util.EstadoPago.PENDIENTE.ToString())
     {
         <button @onclick="ConfirmacionCobro"><span class="fas fa-hand-holding-usd flotando-izquierda-cash"></span></button>
-        <button @onclick="RechazoInscripcion"><span class="fas fa-minus-circle"></span></button>
+        <button @onclick="RechazoInscripcion"><span class="fas fa-minus-circle flotando-izquierda-delete"></span></button>
     }
 </section>
 
@@ -116,8 +116,13 @@
 
     private string EqupoInscripto()
     {
+        rolUsuario = _servicioUsuario.ObtenerUsuarioLogueado().Rol;
+
         string abreviado = InscripcionDTO.Equipo.Nombre.Length > 10 ? new string(InscripcionDTO.Equipo.Nombre.Take(10).ToArray()) + "..." : InscripcionDTO.Equipo.Nombre;
-        return abreviado;
+        
+        string tituloEquipo = rolUsuario == Util.Roles.ORGANIZADOR.ToString() ? "" : $"({abreviado})";
+        
+        return tituloEquipo;
     }
 
 }

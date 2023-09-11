@@ -59,6 +59,8 @@
         </article>
 
     </section>
+
+    <EspacioVertical Altura="60px" />
 }
 else
 {
@@ -78,7 +80,7 @@ else
 
     protected async override Task OnInitializedAsync()
     {
-          if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/",true);
+        if (!await _servicioUsuario.UsuarioEstaAutorizadoPágina(Util.Roles.ORGANIZADOR.ToString())) _nav.NavigateTo("/",true);
 
         _servicioMenu.ActualizarNavegacionPOP(true, false, "/ORGANIZADOR/Gestiones");
         _servicioMenu.ActualizarTitulo("Gestor de inscripciones");
@@ -107,7 +109,7 @@ else
         cargando = true;
         await _servicioTorneo.SeleccionTorneo(torneoId);
         Inscripciones = await _servicioInscripcion.ObtenerInscripcionesOrganizador(_servicioTorneo.ObtenerTorneoActual().Id);
-        //cargando = false;
+        StateHasChanged();
     }
 
     private async Task HabilitadoMercadoPago()
@@ -137,7 +139,7 @@ else
 
     private async Task CobrarInscripcionEfectivo()
     {
-        
+
     }
 
 

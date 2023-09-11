@@ -61,11 +61,13 @@
 .flotando-izquierda-cash {
     position: absolute;
     bottom: 5px;
-    left: 10px;
+    left: 5px;
+    font-size: 20px;
 }
 
 .flotando-izquierda-delete {
     position: absolute;
     bottom: 5px;
-    left: 50px;
+    left: 45px;
+   font-size:20px;
 }

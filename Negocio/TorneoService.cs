@@ -12,6 +12,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilidades;
 
 namespace Negocio
 {
@@ -263,7 +264,7 @@ namespace Negocio
         {
             var listainscripciones = await _db.Inscripciones.Include(inc => inc.Equipo)
                                                             .Include(inc => inc.Torneo)
-                                                            .Where(w => w.Torneo.Id == torneoId)
+                                                            .Where(w => w.Torneo.Id == torneoId && w.Estado == Util.EstadoPago.PAGADO.ToString())
                                                             .ToListAsync();
             return listainscripciones;
         }
