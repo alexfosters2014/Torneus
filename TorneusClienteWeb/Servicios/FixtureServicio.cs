@@ -467,8 +467,8 @@ namespace TorneusClienteWeb.Servicios
                                                                                     TablaPosiciones = s.OrderByDescending(x => x.PartidosGanados)
                                                                                                        .ThenByDescending(x => x.SetsGanados)
                                                                                                        .ThenByDescending(x => x.TotalPuntos)
-                                                                                                       .ThenByDescending(x => x.MejorTiempo)
                                                                                                        .ThenByDescending(x => x.PartidosJugados)
+                                                                                                       .ThenByDescending(x => x.MejorTiempo)
                                                                                                        .ToList()
                                                                                 })
                                                                                 .OrderBy(o => o.Grupo)
@@ -481,8 +481,8 @@ namespace TorneusClienteWeb.Servicios
                                                            .OrderByDescending(x => x.PartidosGanados)
                                                            .ThenByDescending(x => x.SetsGanados)
                                                            .ThenByDescending(x => x.TotalPuntos)
-                                                           .ThenByDescending(x => x.MejorTiempo)
                                                            .ThenByDescending(x => x.PartidosJugados)
+                                                           .ThenByDescending(x => x.MejorTiempo)
                                                            .Select(s => s.Equipo)
                                                            .ToList();
 
