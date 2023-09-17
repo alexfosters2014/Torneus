@@ -189,6 +189,11 @@ input[type="file"] {
     height: auto;
 }
 
+.icono-small-medio {
+    width: 40px;
+    height: auto;
+}
+
 table tr {
     text-align: center;
 }

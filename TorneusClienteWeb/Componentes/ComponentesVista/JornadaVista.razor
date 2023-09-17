@@ -15,6 +15,7 @@
             <img src="/imagenes/tiempo.png" alt="" class="icono-small" />
             <p class="font-size-medio"> @HoraComienzo.ToString("HH:mm") </p>
         </div>
+
     </article>
 
     <MudDivider DividerType="DividerType.Middle" Class="my-3" />
@@ -30,6 +31,18 @@
         <div>
             <p class="font-size-small globo-propiedad">Cel: </p>
             <p class="font-size-medio">@TelContacto</p>
+        </div>
+
+    </article>
+
+     <MudDivider DividerType="DividerType.Middle" Class="my-3" />
+
+    <article class="d-flex justify-content-around align-items-center text-center">
+       
+        <div>
+            <p class="font-size-small globo-propiedad">Lugar de encuentro: </p>
+            <img src="/imagenes/lugar.png" alt="" class="icono-small-medio" />
+            <p class="font-size-medio"> @Lugar </p>
         </div>
 
     </article>
@@ -52,6 +65,7 @@
     [Parameter] public DateTime HoraComienzo { get; set; }
     [Parameter] public string NombreContacto { get; set; }
     [Parameter] public string TelContacto { get; set; }
+    [Parameter] public string Lugar { get; set; }
 
 
 

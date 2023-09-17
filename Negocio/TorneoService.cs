@@ -111,6 +111,17 @@ namespace Negocio
                 if (torneoAEliminar.Suspendido) throw new Exception("No puede eliminar el torneo porque está suspendido");
                 if (torneoAEliminar.Fecha <= DateTime.Today.Date) throw new Exception("No puede eliminar el torneo ya que está en progreso o finalizado");
 
+                var notificacionesAEliminar = await _db.Notificaciones.Where(w => w.Torneo.Id == torneoId).ToListAsync();
+
+                if (notificacionesAEliminar != null)
+                {
+                    if (notificacionesAEliminar.Count > 0)
+                    {
+                        _db.Notificaciones.RemoveRange(notificacionesAEliminar);
+                        await _db.SaveChangesAsync();
+                    }
+                }
+                  
                 _db.Torneos.Remove(torneoAEliminar);
                 int eliminacionRealizada = await _db.SaveChangesAsync();
 
