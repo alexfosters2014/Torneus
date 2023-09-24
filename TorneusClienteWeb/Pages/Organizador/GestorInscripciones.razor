@@ -33,16 +33,16 @@
                 {
                     <MudSelectItem Value="torneo.Id">
                         <img src="@UrlImagenes(torneo.Logo)" height="25" class="mr-1" />
-                        @torneo.Nombre 
+                        @torneo.Nombre
                     </MudSelectItem>
-                    
+
                 }
             </MudSelect>
 
 
         </article>
 
-        <article>
+    <article>
 
             @if (Inscripciones.Count > 0)
             {
@@ -53,6 +53,14 @@
                     {
                         <Cargando />
                     }
+                }
+            }
+            else
+            {
+                @if (toneoIdSeleccionado > 0)
+                {
+                    <EspacioVertical Altura="10px" />
+                    <h5>El torneo "@_servicioTorneo.ObtenerTorneoActual().Nombre" no tiene equipos inscriptos aún</h5>
                 }
             }
            
@@ -74,7 +82,7 @@ else
 
     private string baseURLImagenes;
 
-    private int toneoIdSeleccionado = 1;
+    private int toneoIdSeleccionado = 0;
     private bool habilitadoMercadoPago;
     private bool cargando = false;
 
@@ -108,7 +116,8 @@ else
     {
         cargando = true;
         await _servicioTorneo.SeleccionTorneo(torneoId);
-        Inscripciones = await _servicioInscripcion.ObtenerInscripcionesOrganizador(_servicioTorneo.ObtenerTorneoActual().Id);
+        toneoIdSeleccionado = _servicioTorneo.ObtenerTorneoActual().Id;
+        Inscripciones = await _servicioInscripcion.ObtenerInscripcionesOrganizador(toneoIdSeleccionado);
         StateHasChanged();
     }
 
