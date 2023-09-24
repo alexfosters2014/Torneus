@@ -29,7 +29,14 @@ namespace Negocio
             {
                 if (notificacion == null) throw new Exception("No hay notificacion para registrar");
 
-                notificacion.FechaHora = DateTime.Now;
+                // Obtén la información de zona horaria de Uruguay
+                TimeZoneInfo zonaHorariaUruguay = TimeZoneInfo.FindSystemTimeZoneById("Montevideo Standard Time");
+
+                // Obtiene la fecha y hora actual en la zona horaria de Uruguay
+                DateTime fechaHoraUruguay = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaHorariaUruguay);
+
+
+                notificacion.FechaHora = fechaHoraUruguay;
 
                 _db.Entry(notificacion.Torneo).State = EntityState.Unchanged;
                 if (notificacion.Equipo != null)
