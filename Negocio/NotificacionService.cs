@@ -61,7 +61,8 @@ namespace Negocio
 
 
             List<Notificacion> notificaciones = new List<Notificacion>();
-            List<Notificacion> notificacionesEquipo = new();
+            List<Notificacion> notificacionesEquiposEspecificos = new();
+            List<Notificacion> notificacionesEquipoGeneral = new();
 
 
             try
@@ -75,25 +76,38 @@ namespace Negocio
                 {
                     var inscrpciones = await _inscripcionService.ObtenerInscripcionesSegunUsuario(usuario.Id);
                     List<int> listaIdTorneos = new();
+                    List<int> listaEquiposInscriptos = new();
 
                     foreach (var inscripcion in inscrpciones)
                     {
                         listaIdTorneos.Add(inscripcion.Torneo.Id);
+                        listaEquiposInscriptos.Add(inscripcion.Equipo.Id);
                     }
+                    listaIdTorneos = listaIdTorneos.Distinct().ToList();
 
                     if (listaIdTorneos.Count > 0)
                     {
-                        notificacionesEquipo = await _db.Notificaciones.Include(i => i.Torneo)
+                        notificacionesEquipoGeneral = await _db.Notificaciones.Include(i => i.Torneo)
                                                                        .Include(i => i.Equipo)
-                                                                       .Where(w => listaIdTorneos.Contains(w.Torneo.Id) || 
-                                                                                  (w.Equipo == null && w.General == false))
+                                                                       .Where(w => listaIdTorneos.Contains(w.Torneo.Id) &&
+                                                                                   w.General == false &&
+                                                                                   w.Equipo == null
+                                                                                    )
                                                                        .ToListAsync();
                     }
+
+                    notificacionesEquiposEspecificos = await _db.Notificaciones.Include(i => i.Torneo)
+                                                                       .Include(i => i.Equipo)
+                                                                       .Where(w => listaEquiposInscriptos.Contains(w.Equipo.Id) &&
+                                                                                   w.General == false
+                                                                              )
+                                                                       .ToListAsync();
 
                 }
 
                 notificaciones.AddRange(notificacionGeneral);
-                notificaciones.AddRange(notificacionesEquipo);
+                notificaciones.AddRange(notificacionesEquipoGeneral);
+                notificaciones.AddRange(notificacionesEquiposEspecificos);
 
                 notificaciones = notificaciones.OrderByDescending(w => w.FechaHora).DistinctBy(d => d.Id).ToList();
                 return notificaciones;
