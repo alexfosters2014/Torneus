@@ -56,7 +56,7 @@
         </div>
 
         <div class="medioSet caja">
-            <h4>SET: @Partido.SetActual</h4>
+            <h4>SET: @(Partido.SetActual+1) corriendo... </h4>
             <img src="/imagenes/jugando2.gif" alt="jugando"/>
         </div>
 
@@ -147,10 +147,10 @@
     {
         TorneoDTO torneoActual = _servicioTorneo.ObtenerTorneoActual();
 
-        int SetsMax = torneoActual.SetsMax; 
-        int PuntajeMax = torneoActual.PuntajeMax;
-        int PuntajeMaxDefinitorio = torneoActual.PuntajeMaxUltimoSet;
-        int TorneoId = torneoActual.Id;
+        SetsMax = torneoActual.SetsMax; 
+        PuntajeMax = torneoActual.PuntajeMax;
+        PuntajeMaxDefinitorio = torneoActual.PuntajeMaxUltimoSet;
+        TorneoId = torneoActual.Id;
 
         decimal mitadSetTotales = Math.Round(Convert.ToDecimal(SetsMax) / 2, 2);
         setDiferencia = (int)Math.Ceiling(mitadSetTotales);
