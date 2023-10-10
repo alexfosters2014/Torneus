@@ -195,7 +195,7 @@
 
     private async Task AumentarMarcador(string tipoEquipo)
     {
-            if (UsuarioAutorizadoMarcador)
+        if (UsuarioAutorizadoMarcador)
         {
             if (tipoEquipo == "LOCAL")
             {
@@ -230,6 +230,7 @@
 
     private async Task<bool> VerificarFinalSet()
     {
+       
         if (Partido.MarcadorLocal >= puntajeMaximoSegunSet - 1 && Partido.MarcadorVisitante >= puntajeMaximoSegunSet - 1)
         {
             if (Math.Abs(Partido.MarcadorLocal - Partido.MarcadorVisitante) == 2) return true;
@@ -264,7 +265,7 @@
         Partido.MarcadorLocal = 0;
         Partido.MarcadorVisitante = 0;
         Partido.SetActual += 1;
-        puntajeMaximoSegunSet = Partido.SetActual == SetsMax ? PuntajeMaxDefinitorio : PuntajeMax;  //resolver esto para tiempo real
+        puntajeMaximoSegunSet = Partido.SetActual == SetsMax - 1 ? PuntajeMaxDefinitorio : PuntajeMax;  //resolver esto para tiempo real
     }
 
     private async Task<bool> VerificarFinalPartido()
