@@ -23,17 +23,8 @@ namespace FixtureNegocio
 
         private List<PartidoDTO> CrearRecursivo(List<PartidoDTO> partidos, List<EquipoDTO> equipos, string grupo)
         {
-            if (equipos.Count == 2)
+            if (equipos.Count == 1)
             {
-                PartidoDTO partido = new PartidoDTO()
-                {
-                    EquipoLocal = equipos[0],
-                    EquipoVisitante = equipos[1],
-                    GuidPartido = new Guid(),
-                    Grupo = grupo,
-                    EstadoPartido = Util.EstadoPartido.PENDIENTE.ToString()
-                };
-                partidos.Add(partido);
                 return partidos;
             }
 
